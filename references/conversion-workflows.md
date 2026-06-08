@@ -15,10 +15,12 @@ Use this reference when the source material is PPT, Markdown, HTML, or pasted co
 9. Extract source structure into a neutral outline: deck title, sections, slide titles, body blocks, images, charts/tables, speaker notes, and closing content.
 10. Produce a deck plan for user confirmation before generating the deck. Include total slide count and each slide's outline.
 11. Map each unit to the closest GTLC layout from `template-style-guide.md` and to a design-system style from `presentation-design-system-v1.md`.
-12. Generate one representative sample page and wait for user confirmation.
-13. Generate PPTX from the chosen template asset or generate HTML with equivalent CSS.
-14. Render/preview and fix visual issues before delivery.
-15. Run independent style review with `检查风格`, then independent wording/content review with `检查文字`.
+12. Create a generation log in the user's current working directory before creating the sample page.
+13. Generate one representative sample page and wait for user confirmation.
+14. Generate PPTX from the chosen template asset or generate HTML with equivalent CSS.
+15. Render/preview and fix visual issues before delivery.
+16. Run independent style review with `检查风格`, then independent wording/content review with `检查文字`.
+17. Update the generation log with outputs, checks, fixes, and deferred issues.
 
 ## Required Approval Gates
 
@@ -46,6 +48,14 @@ The plan must include total page count and the selected design-system style for 
 
 ### Gate 3: One-Page Sample
 
+Before creating the sample, create a log file in the user's current working directory:
+
+```text
+gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md
+```
+
+Record the source, scene, format, style choices, template, content optimization decision, and confirmed deck plan. Use `scripts/create_generation_log.py` if convenient, but only from the user's current directory.
+
 After plan approval, create one representative sample page first. Prefer:
 
 - The most common content slide if the deck is mostly informational.
@@ -65,6 +75,8 @@ After full generation:
 If subagents are unavailable, do two separated self-review passes and disclose that limitation.
 
 When generation itself is delegated to a worker, name that subagent `生成内容`. Do not use English subagent names in user-facing output.
+
+Update the generation log before final delivery. The final response must include the log path.
 
 ## PPTX to PPTX
 
@@ -142,3 +154,4 @@ The result should feel like it came from the GTLC template, not like content pas
 - No body text colliding with the top-right logo or bottom footer.
 - User-approved plan and sample page before full deck generation.
 - Independent `检查风格` and `检查文字` review evidence before final delivery.
+- A generation log in the current working directory with sample/final output paths and review records.

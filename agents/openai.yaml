@@ -1,4 +1,4 @@
 interface:
   display_name: "TGO鲲鹏会 PPT 生成 Skill"
-  short_description: "生成 TGO/GTLC 风格 PPT 或 HTML"
-  default_prompt: "使用 $gen-tgo-ppt-skill：先介绍自己，询问 GTLC/日常分享场景与 PPT/HTML 格式，展示编号风格预览，确认大纲和样片后生成演示稿，并用“检查风格”“检查文字”复核。"
+  short_description: "生成 TGO/GTLC 风格 PPT 或 HTML，并记录生成日志"
+  default_prompt: "使用 $gen-tgo-ppt-skill：先介绍自己，询问 GTLC/日常分享场景与 PPT/HTML 格式，展示编号风格预览，确认大纲后在当前目录创建生成日志，再做样片和完整演示稿，并用“检查风格”“检查文字”复核。"

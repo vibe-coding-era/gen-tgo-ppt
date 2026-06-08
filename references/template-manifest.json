@@ -1,7 +1,7 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
-  "version": "v0.3",
+  "version": "v0.4",
   "opening_intro": "我是 TGO鲲鹏会 PPT 生成 Skill，可以生成 PPT 格式和 HTML 格式。",
   "menus": {
     "scenario": ["用于 GTLC", "用于日常分享"],
@@ -40,6 +40,25 @@
       "scope": "Chinese wording, content quality, and source fidelity only"
     }
   },
+  "generation_log": {
+    "required": true,
+    "location": "current_working_directory",
+    "filename_pattern": "gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md",
+    "create_before": "one_page_sample_or_full_output",
+    "update_before_final_delivery": true,
+    "helper_script": "scripts/create_generation_log.py",
+    "required_sections": [
+      "task_metadata",
+      "user_choices",
+      "content_discussion",
+      "deck_plan",
+      "sample_output",
+      "final_outputs",
+      "style_review",
+      "text_review",
+      "deferred_issues"
+    ]
+  },
   "workflow_gates": [
     {
       "id": "content_discussion_after_source_read",
@@ -50,6 +69,12 @@
       "id": "deck_plan_with_page_count_and_per_slide_outline",
       "actor": "lead",
       "requires_user_confirmation": true
+    },
+    {
+      "id": "generation_log_in_current_directory",
+      "actor": "lead",
+      "requires_user_confirmation": false,
+      "required_before": "one_page_sample_or_full_output"
     },
     {
       "id": "one_page_sample_confirmation",
