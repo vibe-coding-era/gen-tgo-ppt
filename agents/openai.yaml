@@ -1,0 +1,4 @@
+interface:
+  display_name: "TGO Kunpeng PPT Generator"
+  short_description: "生成 TGO/GTLC 风格 PPT 或 HTML"
+  default_prompt: "Use $gen-tgo-ppt-skill to introduce itself, ask for GTLC/daily-sharing scenario, ask PPT/HTML format, show numbered style previews, then generate the approved deck."

@@ -1,0 +1,129 @@
+{
+  "name": "gen-tgo-ppt-skill",
+  "author": "肉山",
+  "version": "v0.3",
+  "opening_intro": "我是 TGO鲲鹏会 PPT 生成 Skill，可以生成 PPT 格式和 HTML 格式。",
+  "menus": {
+    "scenario": ["用于 GTLC", "用于日常分享"],
+    "format": ["PPT", "HTML"],
+    "style_preview": "assets/previews/tgo-presentation-design-system-v1.png",
+    "style_reference": "references/presentation-design-system-v1.md",
+    "numeric_confirmation": true
+  },
+  "design_system": {
+    "name": "TGO Presentation Design System",
+    "version": "v1.0",
+    "styles": [
+      "Executive Board",
+      "Silicon Valley",
+      "Big Tech Keynote",
+      "AI Native",
+      "Data Intelligence",
+      "Minimal Luxury",
+      "Chinese Business",
+      "Creative Festival"
+    ],
+    "allow_mixed_page_styles": true,
+    "preserve_tgo_gtlc_background": true
+  },
+  "workflow_gates": [
+    {
+      "id": "content_discussion_after_source_read",
+      "actor": "lead",
+      "requires_user_confirmation": true
+    },
+    {
+      "id": "deck_plan_with_page_count_and_per_slide_outline",
+      "actor": "lead",
+      "requires_user_confirmation": true
+    },
+    {
+      "id": "one_page_sample_confirmation",
+      "actor": "lead",
+      "requires_user_confirmation": true
+    },
+    {
+      "id": "independent_style_review",
+      "actor": "separate_subagent",
+      "order": 1,
+      "before": "independent_content_review",
+      "scope": "visual_fidelity_only"
+    },
+    {
+      "id": "independent_content_review",
+      "actor": "separate_subagent",
+      "order": 2,
+      "after": "independent_style_review",
+      "scope": "content_quality_and_source_fidelity_only"
+    }
+  ],
+  "canvas": {
+    "width_in": 26.667,
+    "height_in": 15.0,
+    "ratio": "16:9"
+  },
+  "templates": {
+    "white": {
+      "asset": "assets/templates/tgo-gtlc-white.pptx",
+      "source": "GTLC-PPT模版-白底.pptx",
+      "role": "formal, print-friendly, dense content",
+      "slides": 7,
+      "masters": 2,
+      "layouts": ["封面", "1_大标题", "大标题", "自我介绍", "目录", "内容1-大字标题", "内容2-小字标题", "空内容", "封底"],
+      "brand_positions_in": {
+        "footer_strip": {"x": 0.0, "y": 13.388, "w": 26.667, "h": 1.612},
+        "top_right_logo": {"x": 22.153, "y": 0.728, "w": 3.465, "h": 2.852}
+      }
+    },
+    "light": {
+      "asset": "assets/templates/tgo-gtlc-light.pptx",
+      "source": "GTLC-PPT模版-浅色.pptx",
+      "role": "default readable business presentation",
+      "slides": 7,
+      "masters": 2,
+      "layouts": ["封面", "1_大标题", "大标题", "自我介绍", "目录", "内容1-大字标题", "内容2-小字标题", "空内容", "封底"]
+    },
+    "dark": {
+      "asset": "assets/templates/tgo-gtlc-dark.pptx",
+      "source": "GTLC-PPT模版-深色.pptx",
+      "role": "keynote, opening, closing, high-impact narrative",
+      "slides": 7,
+      "masters": 1,
+      "layouts": ["封面", "自定义版式", "封面 拷贝", "自我介绍 拷贝", "封面 拷贝 1", "目录 拷贝", "内容", "封底"]
+    }
+  },
+  "colors": {
+    "deep_blue": ["#001851", "#001E64", "#011E64", "#012363", "#02236A"],
+    "secondary_blue": ["#003D8C", "#013F8C", "#023D8B", "#033886", "#043987", "#05408E"],
+    "light_background": ["#F1F4F9", "#F2F5FA"],
+    "white_background": "#FFFFFF",
+    "body_gray": "#535353",
+    "orange_red": ["#E95529", "#EE220C"],
+    "theme_accents": {
+      "accent1": "#0076BA",
+      "accent2": "#00A89D",
+      "accent3": "#1DB100",
+      "accent4": "#F8BA00",
+      "accent5": "#EE220C",
+      "accent6": "#CB297B"
+    }
+  },
+  "typography": {
+    "fallback_chain": ["Source Han Sans CN", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+    "observed_sizes_pt": {
+      "cover_title": "96-115",
+      "master_title": 106,
+      "section_title": "64-106",
+      "content_title": "34-64",
+      "body": 36,
+      "minor": "18-31"
+    }
+  },
+  "scaling": {
+    "standard_13_333_by_7_5_in": {
+      "coordinate_scale": 0.5,
+      "font_scale": 0.5,
+      "requires_visual_recheck": true
+    }
+  }
+}
