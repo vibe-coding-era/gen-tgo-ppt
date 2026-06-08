@@ -18,7 +18,7 @@ Use this reference when the source material is PPT, Markdown, HTML, or pasted co
 12. Generate one representative sample page and wait for user confirmation.
 13. Generate PPTX from the chosen template asset or generate HTML with equivalent CSS.
 14. Render/preview and fix visual issues before delivery.
-15. Run independent style review, then independent content review.
+15. Run independent style review with `检查风格`, then independent wording/content review with `检查文字`.
 
 ## Required Approval Gates
 
@@ -58,11 +58,13 @@ Show the sample as a rendered preview when possible. Ask the user to confirm sty
 
 After full generation:
 
-1. Launch a style-check subagent if available. Its scope is visual only: template fidelity, colors, fonts, layout positions, logo/footer/background placement, contrast, overflow, and page rhythm.
-2. Launch a content-check subagent if available. Its scope is content only: source fidelity, logic, missing context, factual consistency, title accuracy, density, duplicated points, and alignment with any approved optimization.
+1. Launch a subagent named `检查风格` if available. Its scope is visual only: template fidelity, colors, fonts, layout positions, logo/footer/background placement, contrast, overflow, and page rhythm.
+2. Launch a subagent named `检查文字` if available. Its scope is wording and content only: Chinese expression, typos, source fidelity, logic, missing context, factual consistency, title accuracy, density, duplicated points, and alignment with any approved optimization.
 3. Fix blocking findings before final delivery, or clearly record deferred findings with the user's approval.
 
 If subagents are unavailable, do two separated self-review passes and disclose that limitation.
+
+When generation itself is delegated to a worker, name that subagent `生成内容`. Do not use English subagent names in user-facing output.
 
 ## PPTX to PPTX
 
@@ -139,4 +141,4 @@ The result should feel like it came from the GTLC template, not like content pas
 - Clean mapping of source structure to GTLC layout roles.
 - No body text colliding with the top-right logo or bottom footer.
 - User-approved plan and sample page before full deck generation.
-- Independent style and content review evidence before final delivery.
+- Independent `检查风格` and `检查文字` review evidence before final delivery.

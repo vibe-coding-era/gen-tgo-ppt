@@ -1,6 +1,6 @@
 ---
 name: gen-tgo-ppt-skill
-description: Create or adapt TGO Kunpenghui / GTLC presentations and HTML slide pages from PowerPoint, Markdown, HTML, or pasted content. Use when Codex needs to introduce itself as the TGO鲲鹏会 PPT generation skill, ask whether the deck is for GTLC or daily sharing, ask for PPT or HTML output, show numbered visual style previews, accept numeric user choices, and generate a PPTX or HTML deck using bundled TGO/GTLC templates plus the TGO Presentation Design System v1.0 eight-world-class-style framework, including content discussion, page-count/outline plan confirmation, one-page sample confirmation, and independent style/content subagent review.
+description: 生成或改造 TGO鲲鹏会 / GTLC 风格 PPT 与 HTML 演示稿。用于从 PPT、Markdown、HTML 或粘贴内容生成演示材料：开场介绍自己，询问 GTLC/日常分享场景与 PPT/HTML 格式，展示编号风格图供用户选择，按内容探讨、页数大纲确认、一页样片确认、完整生成、中文子智能体“检查风格/检查文字”复核的流程交付。
 ---
 
 # Gen TGO PPT Skill
@@ -23,7 +23,7 @@ Use this skill to turn existing PPT, Markdown, HTML, or pasted content into a TG
 7. Before generating the deck, present a plan for user confirmation: total page count plus each slide's title, purpose, template layout, design-system style, key points, and assets.
 8. After plan approval, generate one representative sample page first and ask the user to confirm style, density, and content treatment.
 9. After sample approval, generate the full PPTX/HTML. Use the relevant PPTX in `assets/templates/` as the base for PPTX output; preserve TGO/GTLC brand background whenever possible.
-10. Render or preview the result before delivery. Then run independent style and content checks as separate review passes.
+10. Render or preview the result before delivery. Then run `检查风格` and `检查文字` as separate review passes.
 
 For every choice menu, accept a plain number as confirmation. If the user enters `1`, map it to the first option in the latest menu.
 
@@ -51,7 +51,7 @@ Do not ask about details already obvious from the source file, such as slide cou
 - Gate 1: Content discussion. After reading the source, ask whether to optimize content before design. If the user says no, preserve wording and structure unless readability requires minor splitting.
 - Gate 2: Deck plan. Present total slide count and a slide-by-slide outline. Do not generate the full deck until the user confirms the plan.
 - Gate 3: One-page sample. Generate one representative page first, preferably the most typical content slide or the riskiest slide. Do not generate the full deck until the user confirms the sample.
-- Gate 4: Full-deck review. After full generation, use separate reviewers for style and content before final delivery.
+- Gate 4: Full-deck review. After full generation, use the Chinese-named reviewers `检查风格` and `检查文字` before final delivery.
 
 If the user explicitly says to skip confirmations, still produce the plan and sample as execution records unless the request is urgent and unambiguous. Never skip final style/content review.
 
@@ -100,8 +100,11 @@ For HTML output:
 
 Independent review:
 
-- Start a separate style-check subagent after full generation when subagent tooling is available. Ask it to inspect only visual fidelity: template choice, colors, typography, layout positions, logo/footer/background placement, contrast, overflow, and slide rhythm.
-- Start a separate content-check subagent after the style check. Ask it to inspect only content quality: logical flow, missing context, factual consistency with the source, title accuracy, slide density, duplicated points, and whether optimization choices match user approval.
+- Use these exact Chinese subagent names whenever subagent tooling is available:
+  - `生成内容`: deck/HTML generation worker, only when generation is delegated away from the lead.
+  - `检查风格`: visual review only, including template choice, colors, typography, layout positions, logo/footer/background placement, contrast, overflow, and slide rhythm.
+  - `检查文字`: wording and content review only, including logical flow, missing context, source fidelity, title accuracy, slide density, duplicated points, and whether optimization choices match user approval.
+- In user-facing plans and review records, use only `生成内容`, `检查风格`, and `检查文字`; do not expose English worker names.
 - If subagents are unavailable, run two clearly separated self-review passes and tell the user that independent subagents were not available.
 
 ## Guardrails

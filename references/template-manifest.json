@@ -26,6 +26,20 @@
     "allow_mixed_page_styles": true,
     "preserve_tgo_gtlc_background": true
   },
+  "subagents": {
+    "generation": {
+      "name": "生成内容",
+      "scope": "outline, one-page sample, or full deck generation when delegated"
+    },
+    "style_review": {
+      "name": "检查风格",
+      "scope": "visual fidelity only"
+    },
+    "text_review": {
+      "name": "检查文字",
+      "scope": "Chinese wording, content quality, and source fidelity only"
+    }
+  },
   "workflow_gates": [
     {
       "id": "content_discussion_after_source_read",
@@ -45,6 +59,7 @@
     {
       "id": "independent_style_review",
       "actor": "separate_subagent",
+      "subagent_name": "检查风格",
       "order": 1,
       "before": "independent_content_review",
       "scope": "visual_fidelity_only"
@@ -52,9 +67,10 @@
     {
       "id": "independent_content_review",
       "actor": "separate_subagent",
+      "subagent_name": "检查文字",
       "order": 2,
       "after": "independent_style_review",
-      "scope": "content_quality_and_source_fidelity_only"
+      "scope": "chinese_wording_content_quality_and_source_fidelity_only"
     }
   ],
   "canvas": {
