@@ -13,6 +13,7 @@ Load this file when the user chooses `1. GTLC 大会`.
 - Default template: `light` for mixed business content.
 - Use `dark` for keynote openings, major announcements, AI-native topics, and closing rhythm.
 - Use `white` for dense reports, tables, or materials intended for printing.
+- Do not default to `tgo-daily`; it is reserved for TGO日常活动分享 and other non-GTLC scenes unless the user explicitly requests it.
 
 ## Layout Priorities
 

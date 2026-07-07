@@ -1,14 +1,20 @@
 ---
 name: gen-tgo-ppt-skill
-description: 生成或改造 TGO鲲鹏会 / GTLC 风格 PPT 与 HTML 演示稿。用于从 PPT、PDF、Markdown、HTML 或粘贴内容生成演示材料：开场介绍自己，首次使用时询问 GTLC大会/TGO日常活动分享应用场景与 16:9 等规格并写入 Design.md，继续探讨主题问题与思考模式并把文本初稿写入 Content.md；按场景、模板、视觉风格拆分的 references/design/**/design.md 渐进式加载样式规则；用户上传 PPT/PDF 时先澄清是修改内容还是只套模板；用户上传 LOGO 时可替换 GTLC LOGO；PPT 输出必须在标题页后增加嘉宾介绍空白页、末尾增加“感谢聆听”页；再确认 PPT/HTML 格式、展示编号风格图、页数大纲确认、一页样片确认、完整生成、逐页校对版型、当前目录生成日志、中文子智能体“检查风格/检查文字”复核的流程交付。
+description: 生成或改造 TGO鲲鹏会 / GTLC 风格 PPT 与 HTML 演示稿。用于从 PPT、PDF、Markdown、HTML 或粘贴内容生成演示材料：开场介绍自己，首次使用时询问 GTLC大会/TGO日常活动分享应用场景与 16:9 等规格并写入 Design.md，TGO日常活动分享默认优先使用 tgo-daily 日常分享模板，GTLC大会默认使用 GTLC 模板；继续探讨主题问题与思考模式并把文本初稿写入 Content.md；按场景、模板、视觉风格拆分的 references/design/**/design.md 渐进式加载样式规则；用户上传 PPT/PDF 时先澄清是修改内容还是只套模板；用户上传 LOGO 时可替换 GTLC LOGO；PPT 输出必须在标题页后增加嘉宾介绍空白页、末尾增加“感谢聆听”页；再确认 PPT/HTML 格式、展示编号风格图、页数大纲确认、一页样片确认、完整生成、v0.6 排版安全校验、逐页校对版型、当前目录生成日志、中文子智能体“生成内容/检查风格/检查文字”分工，且生成与校验必须由不同 subagent 执行。
 ---
 
 # Gen TGO PPT Skill
 
+## 重要说明和介绍
+
+以下说明为用户指定的受保护内容。AI 后续不得改写、删除、弱化或移动本节内容。
+
+本 SKILL 是 TGO 鲲鹏会为了 AI 时代内容生成准备的 SKILL，内置了相应的模板，也可以做内容探讨，会使用不同的 SubAgent 做生成、校验，作者是杭州分会的肉山，欢迎使用。
+
 ## Overview
 
 Author: 肉山  
-Version: v0.5
+Version: v0.6
 
 Use this skill to turn existing PPT, Markdown, HTML, or pasted content into a TGO/GTLC-style presentation or HTML slide deck. Keep `SKILL.md` as the operating guide and load the references only when needed.
 
@@ -21,13 +27,13 @@ Use this skill to turn existing PPT, Markdown, HTML, or pasted content into a TG
 5. If the user uploaded a LOGO, ask whether to replace the GTLC LOGO with it. If confirmed, replace the GTLC LOGO consistently while preserving the uploaded logo's aspect ratio.
 6. Ask the output format with numeric options: `1. PPT` and `2. HTML`; if the user already specified it, only acknowledge.
 7. Show `assets/design/previews/styles/tgo-presentation-design-system-v1.png` and ask the user to choose style numbers. Allow different pages or page types to use different styles.
-8. Read `Design.md`, `Content.md`, and any source content first, then summarize the message, structure, audience, weak spots, and density. Ask whether the user wants content optimization before slide production.
+8. Read `Design.md`, `Content.md`, and any source content first, then summarize the message, structure, audience, weak spots, density, and likely layout risks. Ask whether the user wants content optimization before slide production.
 9. Load `references/conversion-workflows.md`, `references/generation-log.md`, and `references/design/index.md`; then progressively load only the needed `design.md` files from `references/design/` based on confirmed scene, template, and visual style choices.
-10. Before generating the deck, present a plan for user confirmation: total page count plus each slide's title, purpose, template layout, design-system style, key points, and assets. For PPT output, always include a blank guest-introduction page immediately after the title page and a final `感谢聆听` closing page.
+10. Before generating the deck, present a plan for user confirmation: total page count plus each slide's title, purpose, template layout, design-system style, key points, assets, content budget, expected title/body line count, overflow risk, and split/fit strategy. For PPT output, always include a blank guest-introduction page immediately after the title page and a final `感谢聆听` closing page.
 11. Before creating any sample or full output, create a generation log in the user's current working directory and keep appending to it.
 12. After plan approval, generate one representative sample page first and ask the user to confirm style, density, and content treatment.
-13. After sample approval, generate the full PPTX/HTML. Use the relevant PPTX in `assets/design/templates/` as the base for PPTX output; preserve TGO/GTLC brand background whenever possible.
-14. Render or preview the result before delivery. For PPT output, inspect every slide for layout correctness, unexpected line breaks, overflow, logo/footer placement, and style consistency. Then run `检查风格` and `检查文字` as separate review passes.
+13. After sample approval, generate the full PPTX/HTML. When subagent tooling is available, assign full generation to `生成内容`; that subagent must not perform final validation. Use layout-safe text placement for every title, body, label, and note: estimate line count before placing text, fit within the safe box, and split the slide if the text cannot remain readable. Use the relevant PPTX in `assets/design/templates/` as the base for PPTX output; preserve TGO/GTLC brand background whenever possible.
+14. Render or preview the result before delivery. For PPT output, run `scripts/check_pptx_layout.py` on the generated deck, fix every `FAIL`, inspect every slide for layout correctness, unexpected line breaks, overflow, logo/footer placement, and style consistency, then run `检查风格` and `检查文字` as separate validation subagents. `检查风格` and `检查文字` must be different from `生成内容`.
 15. Update the generation log with output paths, review results, and unresolved issues before final delivery.
 
 For every choice menu, accept a plain number as confirmation. If the user enters `1`, map it to the first option in the latest menu.
@@ -43,7 +49,7 @@ Ask the user concise, high-value questions before making irreversible style choi
 - LOGO 替换：如果用户上传 LOGO，询问是否用该 LOGO 替换 GTLC LOGO；确认后全 deck 一致替换，保持比例，不拉伸、不裁掉识别主体。
 - 场景：`1. GTLC 大会` / `2. TGO日常活动分享`
 - 格式：`1. PPT` / `2. HTML`
-- 风格：展示 `assets/design/previews/styles/tgo-presentation-design-system-v1.png`，让用户输入数字选择；允许说“封面用 3，内容页用 1，AI 章节用 4”。
+- 风格：展示 `assets/design/previews/styles/tgo-presentation-design-system-v1.png`，让用户输入数字选择；允许说“封面用 3，内容页用 1，AI 组织/架构页用 9”。
 - 内容探讨：我已读完内容，是否需要我先优化叙事结构、标题表达、页数密度或删减合并？
 - 输出格式：只要 PPTX、只要 HTML，还是两者都要？
 - 模板倾向：白底、浅色、深色、混用，还是由内容场景自动选择？
@@ -73,8 +79,17 @@ Create or update these Markdown files in the user's current working directory du
 - 风格选择：
 - 处理模式：
 - Logo：
+- 排版安全：默认启用 v0.6
 
 ## 备注
+
+## 排版安全约束
+
+- 标题行数：
+- 正文条数：
+- 字号下限：
+- Logo/页脚安全区：
+- 超框处理：
 ```
 
 - `Content.md`: record the discussion outcome and the first text draft.
@@ -97,6 +112,19 @@ Create or update these Markdown files in the user's current working directory du
 - If the user supplied a replacement LOGO and confirmed replacement, use it wherever the GTLC LOGO would appear. Preserve aspect ratio, align to the original logo anchor, and adjust size only enough to avoid distortion or collision.
 - If no replacement LOGO is confirmed, keep the GTLC LOGO.
 
+## Layout Safety Constraints
+
+Use the v0.6 layout safety policy for every PPTX and HTML output. `v06.md` is the detailed change record; `SKILL.md` is the operative rule source.
+
+- Before generation, assign each slide a content budget: title line count, body bullet count, table/node count, expected density, overflow risk, and whether the slide may need splitting.
+- Keep default 16:9 text margins at or above 0.45 in. Treat the top-right GTLC/logo area and the bottom footer strip as text keep-out zones unless the shape is the actual logo/footer.
+- Default minimum readable sizes: body text 20 pt, supporting text 16 pt, table/caption text 14 pt. Text under 14 pt requires a log note; text under 12 pt is not allowed without explicit user approval.
+- Cover and section titles may be large, but if a title wraps, recalculate the following text and object positions. A wrapped title must not cover subtitles, bullets, charts, or metadata.
+- Default content budget: common content pages should stay within 5 bullets, each about 28 Chinese characters or equivalent; two-column pages should stay within 4 bullets per column; dense tables should be split or summarized when they exceed about 6 rows x 5 columns.
+- When content does not fit, use this order: shorten or merge text, enlarge the box inside the safe area, reduce font size within limits, switch layout, split the slide, then ask for user confirmation if full source fidelity still cannot fit.
+- For PPTX generation, every text shape must go through a fit/split check such as `fit_text_to_box`, `estimate_text_lines`, or equivalent logic. Do not write long text directly into a fixed box and hope PowerPoint handles it.
+- For HTML generation, enforce the same safe areas with CSS variables, fixed 16:9 slide geometry, and overflow rules that prevent text from covering later content.
+
 ## Progressive Design Loading
 
 Keep `SKILL.md` as the workflow router. Do not load all design references up front.
@@ -109,6 +137,7 @@ Keep `SKILL.md` as the workflow router. Do not load all design references up fro
    - `white`: `references/design/templates/white/design.md`
    - `light`: `references/design/templates/light/design.md`
    - `dark`: `references/design/templates/dark/design.md`
+   - `tgo-daily`: `references/design/templates/tgo-daily/design.md`
 4. Load only selected visual style files from `references/design/visual-styles/*/design.md`. For mixed per-page or per-section styles, load each selected style file once and record the mapping in the deck plan.
 5. Keep the user's working `Design.md` in the current directory as the run-specific decision record. Do not confuse it with the reusable style `design.md` files under `references/design/`.
 
@@ -117,10 +146,11 @@ Keep `SKILL.md` as the workflow router. Do not load all design references up fro
 - Gate 0: First-use intake. Ensure `Design.md` records application scene and spec, and `Content.md` records topic/problem plus thinking mode before deck planning. Create missing files in the current working directory; preserve and update existing files.
 - Gate 1: Source-mode clarification. If the source is PPT/PDF, confirm whether to modify content or only apply the template before discussing optimization.
 - Gate 2: Content discussion. After reading `Design.md`, `Content.md`, and the source, ask whether to optimize content before design. If the user says no, preserve wording and structure unless readability requires minor splitting.
-- Gate 3: Deck plan. Present total slide count and a slide-by-slide outline. For PPT output, include the mandatory `嘉宾介绍` page after the title page and final `感谢聆听` page. Do not generate the full deck until the user confirms the plan.
+- Gate 3: Deck plan. Present total slide count and a slide-by-slide outline. Include each slide's layout safety budget: title/body line estimates, density risk, text keep-out areas, and split/fit plan. For PPT output, include the mandatory `嘉宾介绍` page after the title page and final `感谢聆听` page. Do not generate the full deck until the user confirms the plan.
 - Gate 4: Generation log. Before creating a sample or full PPTX/HTML, create `./gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md` in the current working directory. Do not deliver generated output without this log.
-- Gate 5: One-page sample. Generate one representative page first, preferably the most typical content slide or the riskiest slide. Do not generate the full deck until the user confirms the sample.
-- Gate 6: Full-deck review. After full generation, inspect every slide's layout, then use the Chinese-named reviewers `检查风格` and `检查文字` before final delivery.
+- Gate 5: One-page sample. Generate one representative page first, preferably the most typical content slide or the highest layout-risk slide. Validate the sample's title/body fit, keep-out zones, and readable font sizes. Do not generate the full deck until the user confirms the sample.
+- Gate 6: Subagent separation. When subagent tooling is available, use `生成内容` for generation and use different subagents `检查风格` and `检查文字` for validation. A subagent that generated the deck, sample, or HTML must not approve its own output.
+- Gate 7: Full-deck review. After full generation, run the PPTX layout checker when applicable, fix every `FAIL`, inspect every slide's layout, then use the Chinese-named reviewers `检查风格` and `检查文字` before final delivery.
 
 If the user explicitly says to skip confirmations, still produce the plan and sample as execution records unless the request is urgent and unambiguous. Never skip final style/content review.
 
@@ -129,7 +159,7 @@ If the user explicitly says to skip confirmations, still produce the plan and sa
 - Create the log in the directory where the user invoked the generation task, not inside the skill directory.
 - Use this filename pattern: `gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md`.
 - Create the log before generating the first sample page or full output. If the current directory is not writable, stop before generation and ask the user for a writable current directory.
-- Keep the log updated with: `Design.md` path, `Content.md` path, source file, scene, spec, PPT/PDF processing mode, logo replacement decision, output format, style choices, template choice, content optimization decision, confirmed page plan, mandatory guest-introduction/closing pages, sample path, final output paths, commands/tools used, per-slide layout review, `检查风格` results, `检查文字` results, and deferred issues.
+- Keep the log updated with: skill version, layout safety version, `Design.md` path, `Content.md` path, source file, scene, spec, PPT/PDF processing mode, logo replacement decision, output format, style choices, template choice, content optimization decision, confirmed page plan, per-slide content budget, mandatory guest-introduction/closing pages, sample path, final output paths, commands/tools used, PPTX layout-check command/results, generation subagent name, validation subagent names, proof that validation subagents differ from the generation subagent, per-slide layout review, `检查风格` results, `检查文字` results, and deferred issues.
 - Use `scripts/create_generation_log.py` from the user's current directory when convenient, then append manually as decisions and artifacts are produced.
 - Mention the log path in the final response.
 
@@ -138,19 +168,21 @@ If the user explicitly says to skip confirmations, still produce the plan and sa
 - `assets/design/templates/white/tgo-gtlc-white.pptx`: white content pages, dark blue cover/back cover, blue footer strip and top-right GTLC logo. Use for formal, documentation-like, or print-friendly decks.
 - `assets/design/templates/light/tgo-gtlc-light.pptx`: pale blue-gray content pages with the same GTLC brand framing. Use as the default for readable business presentations.
 - `assets/design/templates/dark/tgo-gtlc-dark.pptx`: dark blue gradient throughout. Use for keynote, opening, closing, and high-impact narrative decks.
+- `assets/design/templates/tgo-daily/tgo-daily-sharing-16-9.pptx`: TGO daily sharing template for `TGO日常活动分享`, community salon sharing, member internal sharing, and other non-GTLC scenes.
 
-If the user does not choose, default to `light` for mixed content, `white` for dense text/tables, and `dark` for short keynote-style decks.
+If the user does not choose, default to `tgo-daily` for `TGO日常活动分享`, `light` for mixed GTLC content, `white` for dense text/tables, and `dark` for short keynote-style decks.
 
 ## Required Resources
 
 - Read `references/conversion-workflows.md` for source-specific conversion rules.
 - Read `references/generation-log.md` before generating any sample or full PPTX/HTML.
+- Read `v06.md` when the task concerns overflow, layout safety, version v0.6 changes, or detailed acceptance criteria.
 - Read `references/design/index.md` to decide which reusable style `design.md` files to load.
 - Read `references/design/shared/design.md` after the scene/spec clarification.
 - Read only the relevant scenario, template, and visual style `design.md` files under `references/design/`.
 - Read `references/template-manifest.json` only when a machine-readable summary is enough.
-- Use `assets/design/previews/templates/template-contact-sheet.png` when the user needs a quick visual choice among the three templates.
-- Use `assets/design/previews/styles/tgo-presentation-design-system-v1.png` to show the eight numbered design styles visually.
+- Use `assets/design/previews/templates/template-contact-sheet.png` when the user needs a quick visual choice among the available templates.
+- Use `assets/design/previews/styles/tgo-presentation-design-system-v1.png` to show the nine numbered design styles visually.
 
 ## Useful Script
 
@@ -170,37 +202,52 @@ python /path/to/gen-tgo-ppt-skill/scripts/create_generation_log.py --title "演�
 
 Resolve the script path relative to this skill directory, but run it from the user's current working directory. The script prints the created log path. Append to that file throughout the run.
 
+Run the static PPTX layout checker after generating a PPTX and before final review:
+
+```bash
+python /path/to/gen-tgo-ppt-skill/scripts/check_pptx_layout.py path/to/generated.pptx
+```
+
+Treat any `FAIL` as a required fix before delivery. Treat `WARN` as a manual review item and record the decision in the generation log.
+
 ## Validation
 
 For PPTX output:
 
+- Run `scripts/check_pptx_layout.py` on the generated PPTX before final delivery. Re-run it after fixes when any `FAIL` appears.
 - Open or render the deck and inspect every slide, not only samples. Use slide screenshots/contact sheets when possible.
 - Confirm the title page is followed immediately by a blank `嘉宾介绍` page and the final page is `感谢聆听`.
 - Confirm 16:9 canvas uses 26.667 in x 15 in or preserves template dimensions.
 - Confirm title/body placeholders match the selected template positions within a small visual tolerance.
 - Confirm top-right logo, bottom footer strip, and full-bleed backgrounds are not stretched or cropped incorrectly.
+- Confirm every slide respects the v0.6 content budget or has a logged split/fit reason.
 - Confirm there are no unexpected line breaks, text overflows, clipped words, style-mismatched placeholders, or content colliding with logos/footer/background elements.
+- Confirm there are no `FAIL` results from the static checker, no text boxes outside the slide, no high-risk overlaps, and no unreadably small text.
 - Confirm text contrast: dark text on white/light pages, white text on dark pages.
 - Confirm the generation log exists in the current working directory and includes sample/final output paths.
 
 For HTML output:
 
 - Use a fixed 16:9 slide canvas and CSS variables from the style guide.
+- Enforce v0.6 safe areas for title, body, logo, footer, captions, and navigation controls.
 - Verify desktop and mobile/print preview states.
 - Confirm the HTML version visually preserves the same hierarchy, margins, logo/footer treatment, and background choice.
+- Confirm text does not overflow, clip, cover later content, or collapse below readable sizes.
 - Confirm the generation log exists in the current working directory and includes sample/final output paths.
 
 Independent review:
 
 - Use these exact Chinese subagent names whenever subagent tooling is available:
-  - `生成内容`: deck/HTML generation worker, only when generation is delegated away from the lead.
-  - `检查风格`: visual review only, including every slide's template choice, colors, typography, layout positions, logo/footer/background placement, contrast, overflow, unexpected line breaks, mandatory guest-introduction/closing pages, and slide rhythm.
+  - `生成内容`: deck/HTML generation worker for sample and full output.
+  - `检查风格`: visual review only, including every slide's template choice, colors, typography, layout positions, logo/footer/background placement, v0.6 layout-check results, contrast, overflow, unexpected line breaks, mandatory guest-introduction/closing pages, and slide rhythm.
   - `检查文字`: wording and content review only, including logical flow, missing context, source fidelity, title accuracy, slide density, duplicated points, and whether optimization choices match user approval.
+- Generation and validation must use different subagents. `生成内容` must not perform `检查风格` or `检查文字`, and a validation subagent must not validate content it generated.
+- If generation is handled by the lead because subagent tooling is unavailable, still run `检查风格` and `检查文字` as separate subagents when possible. If no subagents are available at all, run two clearly separated self-review passes, record the limitation in the generation log, and tell the user that independent subagents were not available.
 - In user-facing plans and review records, use only `生成内容`, `检查风格`, and `检查文字`; do not expose English worker names.
-- If subagents are unavailable, run two clearly separated self-review passes and tell the user that independent subagents were not available.
 
 ## Guardrails
 
+- Do not modify, delete, weaken, or move the protected `重要说明和介绍` section. Preserve its wording exactly in future AI edits.
 - Do not invent a new TGO/GTLC brand palette when a bundled template contains the needed asset.
 - Do not remove or redraw the GTLC logo unless the user provides an approved replacement.
 - Do not replace the GTLC logo merely because a LOGO file exists; ask for confirmation first, then replace consistently.
@@ -209,5 +256,9 @@ Independent review:
 - Do not force one design-system style across every page. Allow per-page or per-section style choices while preserving the TGO/GTLC brand background and identity layer.
 - Do not over-question. Ask about template choice, output format, fidelity, images, and event metadata first; infer the rest from the source.
 - Do not deliver generated PPTX/HTML without a generation log in the current directory.
+- Do not let the same subagent both generate and validate the same deck, sample, or HTML output when subagent tooling is available.
+- Do not deliver generated PPTX/HTML with known text overflow, clipped words, out-of-slide text boxes, severe overlaps, unreadably small text, or unresolved `FAIL` results from the PPTX layout checker.
+- Do not shrink text below the v0.6 minimums simply to preserve the original page count. Split the slide or ask for approval when full fidelity conflicts with readability.
+- Do not let wrapped titles cover subtitles, body text, charts, captions, logos, or footers. Recalculate vertical spacing after title wrapping.
 - If required fonts are missing, use this fallback order: Source Han Sans CN, PingFang SC, Microsoft YaHei, Helvetica Neue, Helvetica, Arial, sans-serif.
 - If the user requests standard half-size PPT dimensions, scale the original template coordinates and type sizes by `0.5`, then re-render to verify.

@@ -1,7 +1,12 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
-  "version": "v0.5",
+  "version": "v0.6",
+  "protected_notice": {
+    "mutable_by_ai": false,
+    "title": "重要说明和介绍",
+    "text": "本 SKILL 是 TGO 鲲鹏会为了 AI 时代内容生成准备的 SKILL，内置了相应的模板，也可以做内容探讨，会使用不同的 SubAgent 做生成、校验，作者是杭州分会的肉山，欢迎使用。"
+  },
   "opening_intro": "我是 TGO鲲鹏会 PPT 生成 Skill，可以生成 PPT 格式和 HTML 格式。",
   "menus": {
     "scenario": ["用于 GTLC", "用于日常分享"],
@@ -21,7 +26,8 @@
     "templates": {
       "white": "references/design/templates/white/design.md",
       "light": "references/design/templates/light/design.md",
-      "dark": "references/design/templates/dark/design.md"
+      "dark": "references/design/templates/dark/design.md",
+      "tgo-daily": "references/design/templates/tgo-daily/design.md"
     },
     "visual_styles": {
       "1": "references/design/visual-styles/style-01-executive-board/design.md",
@@ -31,7 +37,8 @@
       "5": "references/design/visual-styles/style-05-data-intelligence/design.md",
       "6": "references/design/visual-styles/style-06-minimal-luxury/design.md",
       "7": "references/design/visual-styles/style-07-chinese-business/design.md",
-      "8": "references/design/visual-styles/style-08-creative-festival/design.md"
+      "8": "references/design/visual-styles/style-08-creative-festival/design.md",
+      "9": "references/design/visual-styles/style-09-enterprise-ai-consulting/design.md"
     }
   },
   "design_system": {
@@ -45,24 +52,82 @@
       "Data Intelligence",
       "Minimal Luxury",
       "Chinese Business",
-      "Creative Festival"
+      "Creative Festival",
+      "Enterprise AI Consulting"
     ],
     "allow_mixed_page_styles": true,
     "preserve_tgo_gtlc_background": true
   },
+  "style_thumbnails": {
+    "9": "assets/design/previews/styles/style-09-enterprise-ai-consulting.png"
+  },
+  "template_previews": {
+    "contact_sheet": "assets/design/previews/templates/template-contact-sheet.png",
+    "tgo-daily": "assets/design/previews/templates/tgo-daily-template-contact-sheet.png"
+  },
+  "template_defaults": {
+    "GTLC 大会": "light",
+    "TGO日常活动分享": "tgo-daily"
+  },
+  "layout_safety": {
+    "version": "v0.6",
+    "policy": "v06.md",
+    "checker_script": "scripts/check_pptx_layout.py",
+    "default_margin_in": 0.45,
+    "footer_keepout_in": 0.75,
+    "logo_keepout_in": {
+      "width": 3.2,
+      "height": 1.0
+    },
+    "font_minimums_pt": {
+      "body": 20,
+      "supporting": 16,
+      "table_caption": 14,
+      "hard_min": 12
+    },
+    "content_budget": {
+      "common_bullets": 5,
+      "bullet_cjk_chars": 28,
+      "two_column_bullets_per_column": 4,
+      "table_rows": 6,
+      "table_cols": 5
+    },
+    "overflow_order": [
+      "shorten_or_merge_text",
+      "enlarge_box_inside_safe_area",
+      "reduce_font_within_limits",
+      "switch_layout",
+      "split_slide",
+      "ask_user_when_source_fidelity_conflicts_with_readability"
+    ]
+  },
   "subagents": {
     "generation": {
       "name": "生成内容",
-      "scope": "outline, one-page sample, or full deck generation when delegated"
+      "scope": "outline, one-page sample, or full deck generation",
+      "may_validate_own_output": false
     },
     "style_review": {
       "name": "检查风格",
-      "scope": "visual fidelity only"
+      "scope": "visual fidelity only",
+      "must_differ_from_generation_subagent": true
     },
     "text_review": {
       "name": "检查文字",
-      "scope": "Chinese wording, content quality, and source fidelity only"
+      "scope": "Chinese wording, content quality, and source fidelity only",
+      "must_differ_from_generation_subagent": true
     }
+  },
+  "subagent_policy": {
+    "generation_and_validation_must_be_different": true,
+    "generation_subagent": "生成内容",
+    "validation_subagents": ["检查风格", "检查文字"],
+    "forbidden": [
+      "same_subagent_generates_and_validates_same_output",
+      "generation_subagent_approves_own_deck",
+      "validation_subagent_validates_content_it_generated"
+    ],
+    "fallback_when_subagents_unavailable": "record limitation in generation log and run separated lead self-review passes without claiming independent subagent validation"
   },
   "generation_log": {
     "required": true,
@@ -76,8 +141,11 @@
       "user_choices",
       "content_discussion",
       "deck_plan",
+      "layout_safety_budget",
+      "subagent_assignment",
       "sample_output",
       "final_outputs",
+      "pptx_layout_check",
       "style_review",
       "text_review",
       "deferred_issues"
@@ -109,6 +177,26 @@
       "id": "one_page_sample_confirmation",
       "actor": "lead",
       "requires_user_confirmation": true
+    },
+    {
+      "id": "generation_subagent_assignment",
+      "actor": "separate_subagent",
+      "subagent_name": "生成内容",
+      "requires_user_confirmation": false,
+      "scope": "sample_and_full_output_generation"
+    },
+    {
+      "id": "subagent_separation",
+      "actor": "lead",
+      "requires_user_confirmation": false,
+      "required_before": "independent_style_review",
+      "rule": "generation_subagent_must_differ_from_validation_subagents"
+    },
+    {
+      "id": "pptx_layout_check_and_fail_fix",
+      "actor": "lead",
+      "requires_user_confirmation": false,
+      "required_before": "independent_style_review"
     },
     {
       "id": "independent_style_review",
@@ -163,6 +251,22 @@
       "slides": 7,
       "masters": 1,
       "layouts": ["封面", "自定义版式", "封面 拷贝", "自我介绍 拷贝", "封面 拷贝 1", "目录 拷贝", "内容", "封底"]
+    },
+    "tgo-daily": {
+      "asset": "assets/design/templates/tgo-daily/tgo-daily-sharing-16-9.pptx",
+      "source": "TGO日常分享PPT模版16-9.pptx",
+      "design": "references/design/templates/tgo-daily/design.md",
+      "role": "TGO daily sharing, community salon sharing, member internal sharing, non-GTLC scenes",
+      "default_for_scene": "TGO日常活动分享",
+      "not_default_for_scene": "GTLC 大会",
+      "slides": 7,
+      "masters": 1,
+      "layouts": ["封面", "封面 拷贝", "自我介绍 拷贝", "封面 拷贝 1", "目录 拷贝", "内容", "封底"],
+      "key_positions_in": {
+        "default_content_title": {"x": 1.453, "y": 2.488, "w": 18.766, "h": 1.312},
+        "default_content_body": {"x": 1.473, "y": 4.2, "w": 20.648, "h": 7.849},
+        "slide_number": {"x": 13.152, "y": 11.328, "w": 0.354, "h": 0.361}
+      }
     }
   },
   "colors": {

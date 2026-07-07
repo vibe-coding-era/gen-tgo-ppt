@@ -6,11 +6,12 @@ Load this file when the user chooses `2. TGO日常活动分享`.
 
 - Practical, warm, readable, and discussion-friendly.
 - Prioritize comprehension and reusable knowledge over showmanship.
-- Keep the TGO/GTLC brand frame, but reduce ceremonial weight compared with GTLC大会.
+- Keep the TGO daily sharing brand frame, but reduce ceremonial weight compared with GTLC大会.
 
 ## Template Defaults
 
-- Default template: `light`.
+- Default template: `tgo-daily`.
+- Use `light` when the user explicitly wants the GTLC visual frame for a daily sharing deck.
 - Use `white` for technical sharing, tables, checklists, or training-style materials.
 - Use `dark` only for short keynote-like openings, chapter transitions, or dramatic summaries.
 

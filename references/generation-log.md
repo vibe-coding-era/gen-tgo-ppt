@@ -26,8 +26,11 @@ Record these items as the run progresses:
 - Template choice: white, light, dark, or mixed.
 - Content optimization decision and approved edits.
 - Confirmed page count and slide-by-slide outline, including the mandatory PPT `嘉宾介绍` and `感谢聆听` pages.
+- Per-slide v0.6 layout safety budget: title/body line estimates, density risk, keep-out zones, and split/fit plan.
 - Sample output path and user feedback.
 - Final PPTX/HTML paths.
+- PPTX layout-check command and PASS/WARN/FAIL results when applicable.
+- Generation subagent and validation subagents, with confirmation that generation and validation used different subagents.
 - Render/preview checks and per-slide layout fixes.
 - `检查风格` findings and fixes.
 - `检查文字` findings and fixes.
@@ -38,7 +41,8 @@ Record these items as the run progresses:
 ```markdown
 # gen-tgo-ppt 生成日志
 
-- Skill 版本：v0.5
+- Skill 版本：v0.6
+- 排版安全版本：v0.6
 - 创建时间：
 - 当前目录：
 - Design.md：
@@ -51,6 +55,9 @@ Record these items as the run progresses:
 - Logo替换：
 - 风格选择：
 - 模板选择：
+- 生成 subagent：
+- 校验 subagent：
+- 生成/校验是否不同 subagent：
 
 ## 设计澄清
 
@@ -69,9 +76,27 @@ Record these items as the run progresses:
 
 ## 页数与大纲
 
+- 逐页排版预算：
+
 ## 样片
 
 ## 完整输出
+
+## v0.6 排版安全校验
+
+- 检查命令：
+- 检查结果：
+- FAIL/WARN 页面：
+- 修复动作：
+- 复查结果：
+
+## Subagent 分工
+
+- `生成内容`：
+- `检查风格`：
+- `检查文字`：
+- 生成者是否参与校验：
+- 如果未使用独立 subagent，原因：
 
 ## 逐页版型校对
 

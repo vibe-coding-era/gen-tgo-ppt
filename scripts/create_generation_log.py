@@ -35,7 +35,8 @@ def main() -> None:
 
     content = f"""# gen-tgo-ppt 生成日志
 
-- Skill 版本：v0.5
+- Skill 版本：v0.6
+- 排版安全版本：v0.6
 - 创建时间：{now.isoformat(timespec="seconds")}
 - 当前目录：`{Path.cwd()}`
 - 任务标题：{args.title}
@@ -49,6 +50,9 @@ def main() -> None:
 - Logo替换：{args.logo}
 - 风格选择：{args.style}
 - 模板选择：{args.template}
+- 生成 subagent：待记录。
+- 校验 subagent：待记录。
+- 生成/校验是否不同 subagent：待记录。
 
 ## 设计澄清
 
@@ -69,6 +73,7 @@ def main() -> None:
 ## 页数与大纲
 
 - 待记录：总页数、逐页标题、布局、风格、核心内容，含标题页后的 `嘉宾介绍` 页和最终 `感谢聆听` 页。
+- 待记录：逐页内容预算、标题/正文预计行数、密度风险、是否需要拆页或改布局。
 
 ## 样片
 
@@ -81,6 +86,18 @@ def main() -> None:
 ## 逐页版型校对
 
 - 待记录：每一页是否存在样式错乱、无故换行、文本溢出、裁切、Logo/页脚碰撞，并记录修复结果。
+
+## v0.6 排版安全校验
+
+- 待记录：`scripts/check_pptx_layout.py` 命令、结果、FAIL/WARN 页面、修复动作与复查结果。
+
+## Subagent 分工
+
+- `生成内容`：待记录。
+- `检查风格`：待记录。
+- `检查文字`：待记录。
+- 生成者是否参与校验：不得参与；待复核。
+- 如果未使用独立 subagent，原因：待记录。
 
 ## 检查风格
 
