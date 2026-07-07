@@ -1,14 +1,38 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
-  "version": "v0.4",
+  "version": "v0.5",
   "opening_intro": "我是 TGO鲲鹏会 PPT 生成 Skill，可以生成 PPT 格式和 HTML 格式。",
   "menus": {
     "scenario": ["用于 GTLC", "用于日常分享"],
     "format": ["PPT", "HTML"],
-    "style_preview": "assets/previews/tgo-presentation-design-system-v1.png",
-    "style_reference": "references/presentation-design-system-v1.md",
+    "style_preview": "assets/design/previews/styles/tgo-presentation-design-system-v1.png",
+    "style_reference": "references/design/index.md",
     "numeric_confirmation": true
+  },
+  "design_resources": {
+    "progressive_loading": true,
+    "index": "references/design/index.md",
+    "shared": "references/design/shared/design.md",
+    "scenarios": {
+      "GTLC 大会": "references/design/scenarios/gtlc-conference/design.md",
+      "TGO日常活动分享": "references/design/scenarios/tgo-daily-sharing/design.md"
+    },
+    "templates": {
+      "white": "references/design/templates/white/design.md",
+      "light": "references/design/templates/light/design.md",
+      "dark": "references/design/templates/dark/design.md"
+    },
+    "visual_styles": {
+      "1": "references/design/visual-styles/style-01-executive-board/design.md",
+      "2": "references/design/visual-styles/style-02-silicon-valley/design.md",
+      "3": "references/design/visual-styles/style-03-big-tech-keynote/design.md",
+      "4": "references/design/visual-styles/style-04-ai-native/design.md",
+      "5": "references/design/visual-styles/style-05-data-intelligence/design.md",
+      "6": "references/design/visual-styles/style-06-minimal-luxury/design.md",
+      "7": "references/design/visual-styles/style-07-chinese-business/design.md",
+      "8": "references/design/visual-styles/style-08-creative-festival/design.md"
+    }
   },
   "design_system": {
     "name": "TGO Presentation Design System",
@@ -61,6 +85,11 @@
   },
   "workflow_gates": [
     {
+      "id": "progressive_design_loading_after_clarification",
+      "actor": "lead",
+      "requires_user_confirmation": false
+    },
+    {
       "id": "content_discussion_after_source_read",
       "actor": "lead",
       "requires_user_confirmation": true
@@ -105,8 +134,9 @@
   },
   "templates": {
     "white": {
-      "asset": "assets/templates/tgo-gtlc-white.pptx",
+      "asset": "assets/design/templates/white/tgo-gtlc-white.pptx",
       "source": "GTLC-PPT模版-白底.pptx",
+      "design": "references/design/templates/white/design.md",
       "role": "formal, print-friendly, dense content",
       "slides": 7,
       "masters": 2,
@@ -117,16 +147,18 @@
       }
     },
     "light": {
-      "asset": "assets/templates/tgo-gtlc-light.pptx",
+      "asset": "assets/design/templates/light/tgo-gtlc-light.pptx",
       "source": "GTLC-PPT模版-浅色.pptx",
+      "design": "references/design/templates/light/design.md",
       "role": "default readable business presentation",
       "slides": 7,
       "masters": 2,
       "layouts": ["封面", "1_大标题", "大标题", "自我介绍", "目录", "内容1-大字标题", "内容2-小字标题", "空内容", "封底"]
     },
     "dark": {
-      "asset": "assets/templates/tgo-gtlc-dark.pptx",
+      "asset": "assets/design/templates/dark/tgo-gtlc-dark.pptx",
       "source": "GTLC-PPT模版-深色.pptx",
+      "design": "references/design/templates/dark/design.md",
       "role": "keynote, opening, closing, high-impact narrative",
       "slides": 7,
       "masters": 1,

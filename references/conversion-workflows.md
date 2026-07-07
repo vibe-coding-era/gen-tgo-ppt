@@ -1,32 +1,53 @@
 # TGO/GTLC Conversion Workflows
 
-Use this reference when the source material is PPT, Markdown, HTML, or pasted content.
+Use this reference when the source material is PPT, PDF, Markdown, HTML, or pasted content.
 
 ## Shared Steps
 
 1. Introduce yourself: `我是 TGO鲲鹏会 PPT 生成 Skill，可以生成 PPT 格式和 HTML 格式。`
-2. Ask the scenario with numeric options: `1. 用于 GTLC` and `2. 用于日常分享`.
-3. Ask the output format with numeric options: `1. PPT` and `2. HTML`.
-4. Show the eight-style preview image from `assets/previews/tgo-presentation-design-system-v1.png`, then ask the user to choose style numbers. Accept one number, multiple numbers, or per-page/per-section mapping.
-5. Read the source content end to end before asking detailed design questions.
-6. Summarize the content in plain language: core message, audience, key sections, weak spots, likely slide density, and any missing context.
-7. Ask whether to optimize content. Optimization can include clearer titles, section reordering, deduplication, density reduction, stronger story arc, bilingual title treatment, or speaker-note suggestions.
-8. Clarify event metadata, fidelity, image policy, and per-page style assignments only when needed.
-9. Extract source structure into a neutral outline: deck title, sections, slide titles, body blocks, images, charts/tables, speaker notes, and closing content.
-10. Produce a deck plan for user confirmation before generating the deck. Include total slide count and each slide's outline.
-11. Map each unit to the closest GTLC layout from `template-style-guide.md` and to a design-system style from `presentation-design-system-v1.md`.
-12. Create a generation log in the user's current working directory before creating the sample page.
-13. Generate one representative sample page and wait for user confirmation.
-14. Generate PPTX from the chosen template asset or generate HTML with equivalent CSS.
-15. Render/preview and fix visual issues before delivery.
-16. Run independent style review with `检查风格`, then independent wording/content review with `检查文字`.
-17. Update the generation log with outputs, checks, fixes, and deferred issues.
+2. Ask the scenario with numeric options: `1. GTLC 大会` and `2. TGO日常活动分享`.
+3. If the source is PPT/PDF, ask the processing mode with numeric options: `1. 修改内容并套模板` and `2. 只套模板不改内容`.
+4. If the user uploaded a LOGO, ask whether to replace the GTLC LOGO with it.
+5. Ask the output format with numeric options: `1. PPT` and `2. HTML`.
+6. Show the eight-style preview image from `assets/design/previews/styles/tgo-presentation-design-system-v1.png`, then ask the user to choose style numbers. Accept one number, multiple numbers, or per-page/per-section mapping.
+7. Read the source content end to end before asking detailed design questions.
+8. Summarize the content in plain language: core message, audience, key sections, weak spots, likely slide density, and any missing context.
+9. Ask whether to optimize content. Optimization can include clearer titles, section reordering, deduplication, density reduction, stronger story arc, bilingual title treatment, or speaker-note suggestions. If the user chose `只套模板不改内容`, do not optimize wording or structure.
+10. Clarify event metadata, fidelity, image policy, logo replacement, and per-page style assignments only when needed.
+11. Extract source structure into a neutral outline: deck title, sections, slide titles, body blocks, images, charts/tables, speaker notes, and closing content.
+12. Produce a deck plan for user confirmation before generating the deck. Include total slide count and each slide's outline. For PPT output, include a blank `嘉宾介绍` page immediately after the title page and a final `感谢聆听` page.
+13. Map each unit to the closest GTLC layout from the selected template `references/design/templates/*/design.md` file and to the selected visual style `references/design/visual-styles/*/design.md` file.
+14. Create a generation log in the user's current working directory before creating the sample page.
+15. Generate one representative sample page and wait for user confirmation.
+16. Generate PPTX from the chosen template asset or generate HTML with equivalent CSS.
+17. Render/preview every slide and fix visual issues before delivery, including style drift, unexpected line breaks, overflow, and logo/footer collisions.
+18. Run independent style review with `检查风格`, then independent wording/content review with `检查文字`.
+19. Update the generation log with outputs, checks, fixes, and deferred issues.
 
 ## Required Approval Gates
+
+### Gate 0: Progressive Design Loading
+
+Before detailed design work, read `references/design/index.md` and load only:
+
+- `references/design/shared/design.md`
+- The confirmed scenario `design.md`
+- The selected or inferred template `design.md`
+- The selected visual-style `design.md` files
+
+Do not load all scenario, template, and visual-style files just because they exist.
 
 ### Gate 1: Content Discussion
 
 Before this gate, complete the scene, format, and style selection menus. Use plain numeric options and allow the user to respond with only a number.
+
+If the source is PPT/PDF, first ask:
+
+```text
+你希望我 1. 修改内容并套模板，还是 2. 只套模板不改内容？
+```
+
+If the user chooses `只套模板不改内容`, preserve wording, slide order, slide intent, figures, and speaker-note meaning unless a minimal split is required to avoid overflow.
 
 After reading the source, ask:
 
@@ -45,6 +66,11 @@ Before generating PPTX or HTML, present a table like:
 | 1 | `封面` | ... | Opening | ... | Template background |
 
 The plan must include total page count and the selected design-system style for every slide or section. Wait for user confirmation before making the deck.
+
+For PPT output, the plan must include:
+
+- Page 2 as a blank `嘉宾介绍` page immediately after the title page.
+- The final page as `感谢聆听`.
 
 ### Gate 3: One-Page Sample
 
@@ -68,9 +94,10 @@ Show the sample as a rendered preview when possible. Ask the user to confirm sty
 
 After full generation:
 
-1. Launch a subagent named `检查风格` if available. Its scope is visual only: template fidelity, colors, fonts, layout positions, logo/footer/background placement, contrast, overflow, and page rhythm.
-2. Launch a subagent named `检查文字` if available. Its scope is wording and content only: Chinese expression, typos, source fidelity, logic, missing context, factual consistency, title accuracy, density, duplicated points, and alignment with any approved optimization.
-3. Fix blocking findings before final delivery, or clearly record deferred findings with the user's approval.
+1. Inspect every rendered slide yourself first, preferably using screenshots/contact sheets. Fix template drift, unexpected line breaks, text overflow, clipped words, object collisions, logo/footer placement, and the mandatory `嘉宾介绍`/`感谢聆听` pages.
+2. Launch a subagent named `检查风格` if available. Its scope is visual only: template fidelity, colors, fonts, layout positions, logo/footer/background placement, contrast, overflow, unexpected line breaks, and page rhythm.
+3. Launch a subagent named `检查文字` if available. Its scope is wording and content only: Chinese expression, typos, source fidelity, logic, missing context, factual consistency, title accuracy, density, duplicated points, and alignment with any approved optimization.
+4. Fix blocking findings before final delivery, or clearly record deferred findings with the user's approval.
 
 If subagents are unavailable, do two separated self-review passes and disclose that limitation.
 
@@ -81,11 +108,22 @@ Update the generation log before final delivery. The final response must include
 ## PPTX to PPTX
 
 - Use the chosen template PPTX as the base deck.
+- Ask whether to modify content or only apply the template before changing any wording or structure.
+- Insert a blank `嘉宾介绍` page immediately after the destination title page.
+- Append a final `感谢聆听` page.
 - Preserve source slide intent, not necessarily original decoration.
 - Reuse original images/charts only when they remain readable inside GTLC body zones.
 - Convert source title slides to `封面`, agenda slides to `目录`, section dividers to `1_大标题`/`自定义版式`, normal slides to `内容2-小字标题`/`内容`.
 - If the source already has strong brand constraints, ask whether to merge brands or fully restyle to GTLC.
 - Validate by comparing source page count and checking that every source slide has a mapped destination or an explicit merge/drop decision.
+
+## PDF to PPTX
+
+- Ask whether to modify content or only apply the template before extracting or rewriting content.
+- If the user chooses `只套模板不改内容`, preserve PDF text order and page meaning; recreate editable text only when reliable, otherwise use extracted images or conservative text blocks.
+- If the user chooses `修改内容并套模板`, extract the PDF structure, propose content edits, and wait for approval before rewriting.
+- Insert the mandatory blank `嘉宾介绍` page after the title page and append the final `感谢聆听` page.
+- Render the PDF pages and the generated PPTX pages to compare content coverage and spot missing text, clipped graphics, or unwanted wraps.
 
 ## Markdown to PPTX
 
@@ -112,14 +150,14 @@ For dense Markdown, split by idea rather than by heading alone. Prefer 1 message
 - Ask before screenshotting entire HTML pages into slides. It usually hurts editability.
 - If the source HTML is already a slide deck, keep slide boundaries and restyle each slide.
 
-## PPT/Markdown/HTML to HTML Slides
+## PPT/PDF/Markdown/HTML to HTML Slides
 
 Generate a standalone HTML file or app that uses:
 
 - A fixed 16:9 slide surface.
 - CSS variables for `--gtlc-blue-deep`, `--gtlc-blue`, `--gtlc-bg-light`, `--gtlc-orange`, `--gtlc-text`, and `--gtlc-muted`.
 - Template classes such as `.slide.cover`, `.slide.section`, `.slide.intro`, `.slide.agenda`, `.slide.content`, `.slide.blank`, `.slide.closing`.
-- The same logo/footer/background positions described in `template-style-guide.md`.
+- The same logo/footer/background positions described in the selected template `design.md`.
 - Print styles that preserve one slide per page when possible.
 
 For web/mobile viewing, allow the slide canvas to scale down while preserving the 16:9 ratio. Do not reflow slide internals into a normal article unless the user explicitly asks for a web page instead of an HTML slide deck.
@@ -129,7 +167,9 @@ For web/mobile viewing, allow the slide canvas to scale down while preserving th
 Ask only the relevant subset:
 
 - 需要 PPTX、HTML，还是两者？
-- 场景是 `1. GTLC` 还是 `2. 日常分享`？
+- 场景是 `1. GTLC 大会` 还是 `2. TGO日常活动分享`？
+- 如果上传的是 PPT/PDF：希望 `1. 修改内容并套模板`，还是 `2. 只套模板不改内容`？
+- 如果上传了 LOGO：是否用上传的 LOGO 替换 GTLC LOGO？
 - 格式是 `1. PPT` 还是 `2. HTML`？
 - 八大视觉风格选择哪个数字？是否需要不同页使用不同风格？
 - 希望使用白底、浅色、深色，混用深色封面/章节页和浅色内容页，还是我根据内容自动选择？
@@ -152,6 +192,9 @@ The result should feel like it came from the GTLC template, not like content pas
 - Strong contrast.
 - Clean mapping of source structure to GTLC layout roles.
 - No body text colliding with the top-right logo or bottom footer.
+- No unexpected line breaks, clipped text, overflow, or style-mismatched placeholders on any slide.
+- For PPT output, Page 2 is the blank `嘉宾介绍` page and the final page is `感谢聆听`.
+- Uploaded replacement LOGO is used only after confirmation, consistently and without distortion.
 - User-approved plan and sample page before full deck generation.
 - Independent `检查风格` and `检查文字` review evidence before final delivery.
 - A generation log in the current working directory with sample/final output paths and review records.

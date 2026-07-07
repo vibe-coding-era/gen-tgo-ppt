@@ -13,9 +13,18 @@ def main() -> None:
     parser.add_argument("--title", default="TGO演示稿生成", help="Task or deck title.")
     parser.add_argument("--source", default="待补充", help="Source file or content description.")
     parser.add_argument("--scenario", default="待确认", help="GTLC or daily sharing.")
+    parser.add_argument("--spec", default="16:9", help="Slide ratio/spec, such as 16:9.")
     parser.add_argument("--format", default="待确认", help="PPT, HTML, or both.")
     parser.add_argument("--style", default="待确认", help="Selected visual style numbers.")
     parser.add_argument("--template", default="待确认", help="Template choice.")
+    parser.add_argument("--design-file", default="Design.md", help="Design intake file path.")
+    parser.add_argument("--content-file", default="Content.md", help="Content draft file path.")
+    parser.add_argument(
+        "--processing-mode",
+        default="待确认",
+        help="For PPT/PDF sources: modify content and apply template, or template-only.",
+    )
+    parser.add_argument("--logo", default="默认GTLC LOGO", help="Logo replacement decision or uploaded logo path.")
     args = parser.parse_args()
 
     now = datetime.now().astimezone()
@@ -26,23 +35,40 @@ def main() -> None:
 
     content = f"""# gen-tgo-ppt 生成日志
 
-- Skill 版本：v0.4
+- Skill 版本：v0.5
 - 创建时间：{now.isoformat(timespec="seconds")}
 - 当前目录：`{Path.cwd()}`
 - 任务标题：{args.title}
+- Design.md：{args.design_file}
+- Content.md：{args.content_file}
 - 来源：{args.source}
 - 场景：{args.scenario}
+- 规格：{args.spec}
 - 输出格式：{args.format}
+- 处理模式：{args.processing_mode}
+- Logo替换：{args.logo}
 - 风格选择：{args.style}
 - 模板选择：{args.template}
 
+## 设计澄清
+
+- 应用场景：{args.scenario}
+- 规格：{args.spec}
+- 处理模式：{args.processing_mode}
+- Logo替换：{args.logo}
+- 设计输入文件：{args.design_file}
+- PPT固定页：标题页后新增空白 `嘉宾介绍` 页；末尾新增 `感谢聆听` 页。
+
 ## 内容探讨
 
+- 内容输入文件：{args.content_file}
+- 主题、问题：待记录。
+- 思考模式：待记录。
 - 待记录：内容总结、是否优化、用户确认。
 
 ## 页数与大纲
 
-- 待记录：总页数、逐页标题、布局、风格、核心内容。
+- 待记录：总页数、逐页标题、布局、风格、核心内容，含标题页后的 `嘉宾介绍` 页和最终 `感谢聆听` 页。
 
 ## 样片
 
@@ -51,6 +77,10 @@ def main() -> None:
 ## 完整输出
 
 - 待记录：PPTX/HTML 路径、渲染或预览结果。
+
+## 逐页版型校对
+
+- 待记录：每一页是否存在样式错乱、无故换行、文本溢出、裁切、Logo/页脚碰撞，并记录修复结果。
 
 ## 检查风格
 
