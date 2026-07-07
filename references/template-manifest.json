@@ -1,7 +1,7 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
-  "version": "v0.7",
+  "version": "v0.8",
   "protected_notice": {
     "mutable_by_ai": false,
     "title": "重要说明和介绍",
@@ -70,8 +70,21 @@
     "TGO日常活动分享": "tgo-daily"
   },
   "layout_safety": {
-    "version": "v0.7",
-    "policy": "v07.md",
+    "version": "v0.8",
+    "policy": "references/rule-layout-safety-v08.md",
+    "rule_files": [
+      "references/workflow.md",
+      "references/rule-intake.md",
+      "references/rule-ppt-structure.md",
+      "references/rule-template-selection.md",
+      "references/rule-page-styles.md",
+      "references/rule-validation.md",
+      "references/rule-subagents.md",
+      "references/rule-ssot-handoff.md",
+      "references/rule-guardrails.md",
+      "references/generation-log.md",
+      "references/conversion-workflows.md"
+    ],
     "checker_script": "scripts/check_pptx_layout.py",
     "default_margin_in": 0.45,
     "footer_keepout_in": 0.75,

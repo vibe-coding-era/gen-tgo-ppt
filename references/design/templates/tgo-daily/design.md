@@ -1,36 +1,36 @@
-# TGO Daily Sharing Template Design
+# TGO 日常分享模板设计
 
-Load this file when the user chooses `tgo-daily` template or the scene is `TGO日常活动分享` and the user did not explicitly request a GTLC conference template.
+当用户选择 `tgo-daily` 模板，或场景是 `TGO日常活动分享` 且未明确要求 GTLC 大会模板时，加载本文件。
 
-## Asset
+## 资产
 
 - PPTX: `assets/design/templates/tgo-daily/tgo-daily-sharing-16-9.pptx`
-- Original source: `TGO日常分享PPT模版16-9.pptx`
-- Visual role: TGO daily sharing template for non-GTLC community or internal sharing scenes.
-- Scene rule: use for `TGO日常活动分享`; do not use as the default for `GTLC 大会`.
+- 原始来源：`TGO日常分享PPT模版16-9.pptx`
+- 视觉角色：用于非 GTLC 的社区分享或内部分享场景。
+- 场景规则：用于 `TGO日常活动分享`；不要作为 `GTLC 大会` 默认模板。
 
-## Layouts
+## 版式
 
-- `封面`: opening cover with full-slide TGO sharing background.
-- `封面 拷贝`: cover/content opening variant with title and body placeholders.
-- `自我介绍 拷贝`: speaker/self introduction.
-- `封面 拷贝 1`: alternate cover or section opening.
-- `目录 拷贝`: agenda/table of contents.
-- `内容`: default content page.
-- `封底`: closing/thanks.
+- `封面`：使用整页 TGO 分享背景的开场封面。
+- `封面 拷贝`：带标题和正文占位符的封面/内容开场变体。
+- `自我介绍 拷贝`：讲者或自我介绍页。
+- `封面 拷贝 1`：备用封面或章节开场。
+- `目录 拷贝`：议程或目录页。
+- `内容`：默认内容页。
+- `封底`：结束或感谢页。
 
-## Key Positions
+## 关键位置
 
-- Cover/content title: around `x=1.800 y=2.378-2.544 w=18.684-19.055 h=1.921-3.103`.
-- Cover/content body: around `x=1.801 y=4.862-5.094 w=20.596-20.792 h=6.403`.
-- Default content title: `x=1.453 y=2.488 w=18.766 h=1.312`.
-- Default content body: `x=1.473 y=4.200 w=20.648 h=7.849`.
-- Slide number placeholder: `x=13.152 y=11.328 w=0.354 h=0.361`.
+- 封面/内容标题：约 `x=1.800 y=2.378-2.544 w=18.684-19.055 h=1.921-3.103`。
+- 封面/内容正文：约 `x=1.801 y=4.862-5.094 w=20.596-20.792 h=6.403`。
+- 默认内容标题：`x=1.453 y=2.488 w=18.766 h=1.312`。
+- 默认内容正文：`x=1.473 y=4.200 w=20.648 h=7.849`。
+- 页码占位符：`x=13.152 y=11.328 w=0.354 h=0.361`。
 
-## Use
+## 使用规则
 
-- Use for TGO daily activity sharing, community salon sharing, member internal sharing, lightweight topic talks, and non-GTLC content.
-- Prefer concise titles and relaxed community-sharing rhythm while preserving TGO brand backgrounds.
-- Keep GTLC conference templates (`white`, `light`, `dark`) for GTLC conference decks unless the user explicitly chooses otherwise.
-- Many brand elements are baked into full-slide background images; preserve the background rather than redrawing it.
-- Apply v0.7 layout safety checks before delivery.
+- 用于 TGO 日常活动分享、社区沙龙分享、会员内部分享、轻量主题分享和非 GTLC 内容。
+- 标题应简洁，节奏可比 GTLC 大会更轻松，但必须保留 TGO 品牌背景。
+- GTLC 大会材料默认继续使用 `white`、`light`、`dark` 模板，除非用户明确选择其他模板。
+- 许多品牌元素已经烘焙在整页背景图里，优先保留背景，不要重绘。
+- 交付前必须执行 v0.8 排版安全检查。

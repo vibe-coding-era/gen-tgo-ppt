@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static PPTX layout checker for gen-tgo-ppt v0.7."""
+"""Static PPTX layout checker for gen-tgo-ppt v0.8."""
 
 from __future__ import annotations
 

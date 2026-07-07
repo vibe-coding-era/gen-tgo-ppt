@@ -1,50 +1,47 @@
-# Generation Log
+# 生成日志规则
 
-Every generation run must leave a Markdown log in the user's current working directory.
+每次生成、改造或重大修复都必须在用户当前工作目录留下 Markdown 日志。
 
-## File Rule
+## 文件规则
 
-- Location: the current working directory where the user invoked the skill.
-- Filename: `gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md`.
-- Timing: create before generating the first sample page or full PPTX/HTML.
-- Delivery: include the log path in the final response.
-- Blocker: if the current directory is not writable, stop before generation and ask for a writable directory.
+- 位置：用户发起任务的当前工作目录。
+- 文件名：`gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md`。
+- 时机：生成样片或完整文件前创建。
+- 交付：最终回复必须给出日志路径。
+- 阻塞：当前目录不可写时，先停止并请求可写目录。
 
-## Required Content
+## 必填内容
 
-Record these items as the run progresses:
+- Skill 版本和排版安全版本。
+- `Design.md` 与 `Content.md` 路径。
+- 来源文件或粘贴内容说明。
+- 场景、规格、输出格式、模板、风格选择。
+- PPT/PDF 处理模式。
+- Logo 替换决定。
+- 是否优化内容，以及用户确认结果。
+- 页数计划和逐页预算，包含固定 `嘉宾介绍` 与 `感谢聆听` 页。
+- 样片路径、预览方式和用户反馈。
+- 完整输出路径。
+- 检查命令、PASS/WARN/FAIL 结果、返工动作和复查结果。
+- 渲染/预览证据。
+- `生成内容`、`检查风格`、`检查文字` 分工。
+- 生成与校验是否职责分离。
+- 每个已加载 rule 的规则子智能体分工。
+- SSOT 路径或 SSOT 区块。
+- 每个规则子智能体的结构化交接摘要。
+- 规则冲突、裁决理由和唯一执行计划。
+- 遗留问题和用户批准的例外。
 
-- Source file or pasted-content description.
-- `Design.md` path and design intake summary.
-- `Content.md` path and text-draft summary.
-- Scene: GTLC大会 or TGO日常活动分享.
-- Spec: default 16:9 or another confirmed ratio.
-- Output format: PPT, HTML, or both.
-- PPT/PDF processing mode: modify content + apply template, or template-only.
-- Logo replacement decision and uploaded logo path if applicable.
-- Selected visual style numbers and any per-page/per-section mapping.
-- Template choice: white, light, dark, or mixed.
-- Content optimization decision and approved edits.
-- Confirmed page count and slide-by-slide outline, including the mandatory PPT `嘉宾介绍` and `感谢聆听` pages.
-- Per-slide v0.7 layout safety budget: title/body line estimates, density risk, keep-out zones, and split/fit plan.
-- Sample output path and user feedback.
-- Final PPTX/HTML paths.
-- PPTX layout-check command and PASS/WARN/FAIL results when applicable.
-- Generation subagent and validation subagents, with confirmation that generation and validation used different subagents.
-- Render/preview checks and per-slide layout fixes.
-- `检查风格` findings and fixes.
-- `检查文字` findings and fixes.
-- Deferred issues approved by the user.
-
-## Starter Template
+## 模板
 
 ```markdown
 # gen-tgo-ppt 生成日志
 
-- Skill 版本：v0.7
-- 排版安全版本：v0.7
+- Skill 版本：v0.8
+- 排版安全版本：v0.8
 - 创建时间：
 - 当前目录：
+- 任务标题：
 - Design.md：
 - Content.md：
 - 来源：
@@ -55,34 +52,23 @@ Record these items as the run progresses:
 - Logo替换：
 - 风格选择：
 - 模板选择：
-- 生成 subagent：
-- 校验 subagent：
-- 生成/校验是否不同 subagent：
+- 生成子智能体：
+- 校验子智能体：
+- 生成/校验是否不同子智能体：
+- 规则子智能体：
+- SSOT：
 
 ## 设计澄清
 
-- 应用场景：
-- 规格：
-- 处理模式：
-- Logo替换：
-- PPT固定页：
-  - 标题页后：嘉宾介绍
-  - 结束页：感谢聆听
-
 ## 内容探讨
 
-- 主题、问题：
-- 思考模式：
-
 ## 页数与大纲
-
-- 逐页排版预算：
 
 ## 样片
 
 ## 完整输出
 
-## v0.7 排版安全校验
+## v0.8 排版安全校验
 
 - 检查命令：
 - 检查结果：
@@ -90,19 +76,40 @@ Record these items as the run progresses:
 - 修复动作：
 - 复查结果：
 
-## Subagent 分工
-
-- `生成内容`：
-- `检查风格`：
-- `检查文字`：
-- 生成者是否参与校验：
-- 如果未使用独立 subagent，原因：
-
 ## 逐页版型校对
+
+## 子智能体分工
+
+## 规则子智能体交接
+
+| 规则文件 | 子智能体 | 结论 | 风险 | 证据 |
+| --- | --- | --- | --- | --- |
+
+## SSOT
+
+### 任务目标
+
+### 用户明确要求
+
+### 已加载规则
+
+### 规则交接摘要
+
+### 冲突与裁决
+
+### 当前唯一执行计划
+
+### 产物路径
+
+### 校验结果
+
+### 遗留问题
 
 ## 检查风格
 
 ## 检查文字
+
+## 操作记录
 
 ## 待处理问题
 ```
