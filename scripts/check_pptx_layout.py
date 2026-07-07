@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Static PPTX layout checker for gen-tgo-ppt v0.81."""
+"""Static PPTX layout checker for gen-tgo-ppt V8.02."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ import json
 import math
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from pptx import Presentation
 from pptx.enum.shapes import MSO_SHAPE_TYPE
@@ -33,6 +34,11 @@ PROJECT_INFO_LABELS = {
     "主办方",
     "承办方",
 }
+AGENDA_MARKERS = {"目录", "议程", "大纲", "contents", "agenda"}
+DEFAULT_AGENDA_FORBIDDEN_PATTERNS = (
+    "今天只讲",
+    "只讲一个问题",
+)
 
 
 @dataclass(frozen=True)
@@ -140,6 +146,46 @@ def text_preview(text: str, limit: int = 28) -> str:
 
 def compact_text(text: str) -> str:
     return " ".join(text.split())
+
+
+def is_agenda_marker_text(text: str) -> bool:
+    normalized = normalize_text(text)
+    return any(normalize_text(marker) in normalized for marker in AGENDA_MARKERS)
+
+
+def slide_layout_name(slide) -> str:
+    try:
+        return str(slide.slide_layout.name or "")
+    except Exception:
+        return ""
+
+
+def is_agenda_slide(slide, texts: list[str]) -> bool:
+    return is_agenda_marker_text(slide_layout_name(slide)) or any(is_agenda_marker_text(text) for text in texts)
+
+
+def parse_rgb(value: str) -> tuple[int, int, int]:
+    compact = value.strip().lstrip("#")
+    if len(compact) != 6:
+        raise ValueError(f"Expected 6-digit RGB hex, got {value!r}")
+    return (int(compact[0:2], 16), int(compact[2:4], 16), int(compact[4:6], 16))
+
+
+def shape_fill_rgb(shape) -> Optional[tuple[int, int, int]]:
+    try:
+        rgb = shape.fill.fore_color.rgb
+    except Exception:
+        return None
+    if rgb is None:
+        return None
+    try:
+        return parse_rgb(str(rgb))
+    except ValueError:
+        return None
+
+
+def rgb_near(candidate: tuple[int, int, int], target: tuple[int, int, int], tolerance: int) -> bool:
+    return max(abs(candidate[index] - target[index]) for index in range(3)) <= tolerance
 
 
 def shape_label(shape, text: str) -> str:
@@ -328,6 +374,163 @@ def check_cover_text_safe_zone(
         )
 
 
+def looks_like_key_page_solid_panel(shape, slide_w: int, slide_h: int, target_rgb: tuple[int, int, int], args: argparse.Namespace) -> bool:
+    rect = shape_rect(shape)
+    if rect.width <= 0 or rect.height <= 0:
+        return False
+
+    rgb = shape_fill_rgb(shape)
+    if rgb is None or not rgb_near(rgb, target_rgb, args.key_panel_color_tolerance):
+        return False
+
+    width_ratio = rect.width / max(1, slide_w)
+    height_ratio = rect.height / max(1, slide_h)
+    area_ratio = rect.area / max(1, slide_w * slide_h)
+    if width_ratio < args.key_panel_min_width_ratio or width_ratio > args.key_panel_max_width_ratio:
+        return False
+    if height_ratio < args.key_panel_min_height_ratio or height_ratio > args.key_panel_max_height_ratio:
+        return False
+    if area_ratio < args.key_panel_min_area_ratio:
+        return False
+
+    center_x = (rect.left + rect.width / 2) / max(1, slide_w)
+    center_y = (rect.top + rect.height / 2) / max(1, slide_h)
+    if abs(center_x - 0.5) > args.key_panel_center_x_tolerance:
+        return False
+    if abs(center_y - 0.5) > args.key_panel_center_y_tolerance:
+        return False
+    return True
+
+
+def has_key_page_solid_panel(slide, slide_w: int, slide_h: int, target_rgb: tuple[int, int, int], args: argparse.Namespace) -> bool:
+    return any(
+        looks_like_key_page_solid_panel(shape, slide_w, slide_h, target_rgb, args)
+        for shape in walk_shapes(slide.shapes)
+    )
+
+
+def check_key_page_solid_panel(
+    issues: list[dict],
+    slide_index: int,
+    slide_count: int,
+    slide,
+    slide_w: int,
+    slide_h: int,
+    args: argparse.Namespace,
+) -> None:
+    if not args.check_key_page_solid_panel:
+        return
+    if slide_index not in (1, slide_count):
+        return
+    if slide_index == 1 and args.allow_native_cover_layout:
+        return
+    if slide_index == slide_count and args.allow_native_closing_layout:
+        return
+
+    target_rgb = parse_rgb(args.key_panel_color)
+    if has_key_page_solid_panel(slide, slide_w, slide_h, target_rgb, args):
+        return
+
+    role = "Title page" if slide_index == 1 else "Final closing page"
+    exception_flag = "--allow-native-cover-layout" if slide_index == 1 else "--allow-native-closing-layout"
+    add_issue(
+        issues,
+        "FAIL",
+        slide_index,
+        "KEY_PAGE_SOLID_PANEL_MISSING",
+        f"{role} must use a centered opaque solid content panel near #{args.key_panel_color}; "
+        f"use {exception_flag} only when the user explicitly approved the native layout exception.",
+    )
+
+
+def check_agenda_page_order(
+    issues: list[dict],
+    slide_index: int,
+    slide_count: int,
+    first_agenda_index: Optional[int],
+    args: argparse.Namespace,
+) -> None:
+    if not args.check_agenda_page:
+        return
+
+    expected_index = min(max(1, args.agenda_page_index), slide_count)
+    if first_agenda_index is None:
+        if args.require_agenda_page and slide_index == expected_index:
+            add_issue(
+                issues,
+                "FAIL",
+                slide_index,
+                "AGENDA_PAGE_MISSING",
+                f"Deck must include an agenda/table-of-contents page at slide {args.agenda_page_index} "
+                "immediately after the mandatory guest-introduction page.",
+            )
+        return
+
+    if slide_index != first_agenda_index:
+        return
+    if first_agenda_index == args.agenda_page_index or args.allow_agenda_after_content:
+        return
+
+    add_issue(
+        issues,
+        "FAIL",
+        slide_index,
+        "AGENDA_PAGE_ORDER",
+        f"First agenda/table-of-contents page is slide {first_agenda_index}; it must be slide "
+        f"{args.agenda_page_index} immediately after the mandatory guest-introduction page.",
+    )
+
+
+def check_agenda_slide_content(
+    issues: list[dict],
+    slide_index: int,
+    is_agenda: bool,
+    text_items: list[tuple],
+    slide_h: int,
+    args: argparse.Namespace,
+) -> None:
+    if not args.check_agenda_page or not is_agenda:
+        return
+
+    for shape, text in text_items:
+        compact = compact_text(text)
+        if not compact:
+            continue
+        normalized = normalize_text(compact)
+        forbidden_pattern = next(
+            (
+                pattern
+                for pattern in args.agenda_forbidden_title_pattern
+                if normalize_text(pattern) and normalize_text(pattern) in normalized
+            ),
+            None,
+        )
+        if forbidden_pattern:
+            add_issue(
+                issues,
+                "FAIL",
+                slide_index,
+                "AGENDA_FORBIDDEN_TITLE_TEXT",
+                f"{shape_label(shape, text)} appears on an agenda page but matches narrative/body-title "
+                f"pattern {forbidden_pattern!r}; move it to the first body slide.",
+            )
+            continue
+
+        if args.allow_agenda_narrative_header or is_agenda_marker_text(compact):
+            continue
+        rect = shape_rect(shape)
+        is_top_header = rect.top / max(1, slide_h) <= args.agenda_header_bottom_ratio
+        if is_top_header and weighted_text_len(compact) > args.agenda_header_max_weighted_len:
+            add_issue(
+                issues,
+                "FAIL",
+                slide_index,
+                "AGENDA_NARRATIVE_HEADER",
+                f"{shape_label(shape, text)} is a long top narrative/header on an agenda page; "
+                "keep thesis/problem statements on the first body slide.",
+            )
+
+
 def check_pptx(path: Path, args: argparse.Namespace) -> dict:
     prs = Presentation(path)
     slide_w = int(prs.slide_width)
@@ -353,6 +556,20 @@ def check_pptx(path: Path, args: argparse.Namespace) -> dict:
     large_title_pt = scaled(args.large_title_pt, layout_scale)
     issues: list[dict] = []
     slide_statuses = []
+    slide_items_cache = []
+    agenda_indices: list[int] = []
+
+    for slide_index, slide in enumerate(prs.slides, start=1):
+        text_items = []
+        for shape in walk_shapes(slide.shapes):
+            text = shape_text(shape)
+            if text:
+                text_items.append((shape, text))
+        slide_items_cache.append((slide, text_items))
+        if is_agenda_slide(slide, [text for _, text in text_items]):
+            agenda_indices.append(slide_index)
+
+    first_agenda_index = agenda_indices[0] if agenda_indices else None
 
     if len(prs.slides) < 2 and not args.skip_mandatory_page_check:
         add_issue(
@@ -363,14 +580,10 @@ def check_pptx(path: Path, args: argparse.Namespace) -> dict:
             "Deck must include a mandatory blank guest-introduction page immediately after the cover.",
         )
 
-    for slide_index, slide in enumerate(prs.slides, start=1):
+    for slide_index, (slide, text_items) in enumerate(slide_items_cache, start=1):
         text_shapes = []
         slide_issues_start = len(issues)
-        text_items = []
-        for shape in walk_shapes(slide.shapes):
-            text = shape_text(shape)
-            if text:
-                text_items.append((shape, text))
+        slide_is_agenda = slide_index in agenda_indices
         has_project_info_style = (
             args.check_project_info_style
             and any(normalize_text(args.project_info_title) in normalize_text(text) for _, text in text_items)
@@ -384,6 +597,9 @@ def check_pptx(path: Path, args: argparse.Namespace) -> dict:
             [text for _, text in text_items],
             args,
         )
+        check_key_page_solid_panel(issues, slide_index, len(prs.slides), slide, slide_w, slide_h, args)
+        check_agenda_page_order(issues, slide_index, len(prs.slides), first_agenda_index, args)
+        check_agenda_slide_content(issues, slide_index, slide_is_agenda, text_items, slide_h, args)
 
         for shape, text in text_items:
 
@@ -605,6 +821,26 @@ def main() -> None:
     parser.add_argument("--cover-text-right-ratio", type=float, default=0.33)
     parser.add_argument("--cover-left-column-center-ratio", type=float, default=0.43)
     parser.add_argument("--allow-theme-fonts-on-key-pages", action="store_true", help="Do not warn when cover/closing text uses theme fonts.")
+    parser.add_argument("--check-key-page-solid-panel", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--allow-native-cover-layout", action="store_true", help="Allow title page without the default centered solid panel after explicit user approval.")
+    parser.add_argument("--allow-native-closing-layout", action="store_true", help="Allow final page without the default centered solid panel after explicit user approval.")
+    parser.add_argument("--key-panel-color", default="061C4C", help="Expected deep-blue solid panel color as 6-digit RGB hex.")
+    parser.add_argument("--key-panel-color-tolerance", type=int, default=48)
+    parser.add_argument("--key-panel-min-width-ratio", type=float, default=0.30)
+    parser.add_argument("--key-panel-max-width-ratio", type=float, default=0.86)
+    parser.add_argument("--key-panel-min-height-ratio", type=float, default=0.12)
+    parser.add_argument("--key-panel-max-height-ratio", type=float, default=0.58)
+    parser.add_argument("--key-panel-min-area-ratio", type=float, default=0.035)
+    parser.add_argument("--key-panel-center-x-tolerance", type=float, default=0.18)
+    parser.add_argument("--key-panel-center-y-tolerance", type=float, default=0.24)
+    parser.add_argument("--check-agenda-page", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--require-agenda-page", action="store_true", help="Require an agenda/table-of-contents page at --agenda-page-index.")
+    parser.add_argument("--allow-agenda-after-content", action="store_true", help="Allow the first agenda page to appear after body content when explicitly approved.")
+    parser.add_argument("--allow-agenda-narrative-header", action="store_true", help="Allow long narrative headers on agenda pages after explicit approval.")
+    parser.add_argument("--agenda-page-index", type=int, default=3)
+    parser.add_argument("--agenda-header-bottom-ratio", type=float, default=0.26)
+    parser.add_argument("--agenda-header-max-weighted-len", type=float, default=18.0)
+    parser.add_argument("--agenda-forbidden-title-pattern", action="append", default=list(DEFAULT_AGENDA_FORBIDDEN_PATTERNS))
     parser.add_argument("--margin-in", type=float, default=0.45)
     parser.add_argument("--footer-in", type=float, default=0.75)
     parser.add_argument("--logo-width-in", type=float, default=3.2)

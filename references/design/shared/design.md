@@ -60,9 +60,11 @@ Prefer fewer words and larger type. If dense content is unavoidable, preserve ma
 ## Required PPT Pages
 
 - Insert a blank `嘉宾介绍` page immediately after the title/cover page for every PPT/PPTX output.
+- Put the agenda/table-of-contents page immediately after `嘉宾介绍` as page 3 whenever an agenda page is used. Body content starts after the agenda.
 - Append a final `感谢聆听` page for every PPT/PPTX output.
 - Count these pages in the deck plan, final page count, and generation log.
 - The `嘉宾介绍` page should not contain helper labels, instructions, or placeholder explanations. If the user supplies guest content, record the exception in the plan and log.
+- The agenda page should contain only agenda heading, section numbers, section names, and short structure notes. Keep narrative thesis/problem titles on the first body page, not on the agenda page.
 - The final page should contain the exact closing copy `感谢聆听` unless the user explicitly approves alternate closing copy in the plan and log.
 
 ## Logo Rules
@@ -79,7 +81,8 @@ Prefer fewer words and larger type. If dense content is unavoidable, preserve ma
 
 ## Solid Panel Cover/Closing
 
-- For dark GTLC cover and closing pages, use a centered solid content panel when the background master visual competes with page text.
+- For dark GTLC title and closing pages, use the same centered solid content panel by default.
+- Do not apply the solid panel only to the closing page while leaving the title page on the native left-column cover. Keeping a native left-column title page requires explicit user confirmation recorded in the plan, SSOT, and generation log.
 - Background treatment: preserve the GTLC background raster at the slide ratio, apply only light blur/dimming, and never stretch or crop it off-ratio.
 - Content panel: fully opaque deep blue, recommended `#061C4C` or close GTLC deep blue; no background may show through inside the panel.
 - Panel sizing: calculate width from the longest text line plus horizontal padding; calculate height from text stack, separators, and balanced top/bottom padding.
@@ -91,4 +94,5 @@ Prefer fewer words and larger type. If dense content is unavoidable, preserve ma
 - Render or preview every slide before delivery.
 - Check unexpected line breaks, text overflow, clipped words, placeholder style drift, object collisions, and logo/footer placement.
 - Confirm the generated deck has the mandatory blank `嘉宾介绍` page and `感谢聆听` closing page.
-- On solid-panel cover/closing pages, confirm the panel is visually opaque and has balanced padding above and below the text group.
+- Confirm title and closing pages both have the centered solid panel unless a recorded user-approved exception keeps the native title layout.
+- On solid-panel title/closing pages, confirm the panel is visually opaque and has balanced padding above and below the text group.
