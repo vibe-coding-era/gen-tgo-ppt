@@ -26,7 +26,7 @@ Record these items as the run progresses:
 - Template choice: white, light, dark, or mixed.
 - Content optimization decision and approved edits.
 - Confirmed page count and slide-by-slide outline, including the mandatory PPT `嘉宾介绍` and `感谢聆听` pages.
-- Per-slide v0.6 layout safety budget: title/body line estimates, density risk, keep-out zones, and split/fit plan.
+- Per-slide v0.7 layout safety budget: title/body line estimates, density risk, keep-out zones, and split/fit plan.
 - Sample output path and user feedback.
 - Final PPTX/HTML paths.
 - PPTX layout-check command and PASS/WARN/FAIL results when applicable.
@@ -41,8 +41,8 @@ Record these items as the run progresses:
 ```markdown
 # gen-tgo-ppt 生成日志
 
-- Skill 版本：v0.6
-- 排版安全版本：v0.6
+- Skill 版本：v0.7
+- 排版安全版本：v0.7
 - 创建时间：
 - 当前目录：
 - Design.md：
@@ -82,7 +82,7 @@ Record these items as the run progresses:
 
 ## 完整输出
 
-## v0.6 排版安全校验
+## v0.7 排版安全校验
 
 - 检查命令：
 - 检查结果：

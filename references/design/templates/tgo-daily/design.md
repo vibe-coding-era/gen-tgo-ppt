@@ -33,4 +33,4 @@ Load this file when the user chooses `tgo-daily` template or the scene is `TGOæ—
 - Prefer concise titles and relaxed community-sharing rhythm while preserving TGO brand backgrounds.
 - Keep GTLC conference templates (`white`, `light`, `dark`) for GTLC conference decks unless the user explicitly chooses otherwise.
 - Many brand elements are baked into full-slide background images; preserve the background rather than redrawing it.
-- Apply v0.6 layout safety checks before delivery.
+- Apply v0.7 layout safety checks before delivery.

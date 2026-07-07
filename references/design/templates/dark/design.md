@@ -26,6 +26,22 @@ Load this file when the user chooses dark template, keynote mode, high-impact na
 - Default content title: `x=1.453 y=2.488 w=18.766 h=1.312`
 - Default content body: `x=1.487 y=4.200 w=20.648 h=7.849`
 
+## Cover Safety
+
+- Dark GTLC covers often use a left text column and a center/right conference master visual. Treat the center/right master visual as a text keep-out zone.
+- For the default `26.667 x 15 in` canvas, keep left-column cover text inside approximately `x=1.5..8.4 in` unless the selected cover variant is explicitly centered.
+- For the half-size `13.333 x 7.5 in` canvas, keep left-column cover text inside approximately `x=0.75..4.2 in`.
+- Subtitle, sponsor identity, date, city, and speaker metadata should fit on one readable line inside that safe zone. If they do not fit, shorten, wrap within the left column and push following metadata down, or switch to a centered/alternate cover layout.
+- When sponsor or event text would exceed the left text-safe zone, switch to a centered solid-panel cover instead of reducing safety margins.
+
+## Solid Panel Cover/Closing
+
+- Background: reuse the dark GTLC full-slide raster, apply a light blur/dim treatment, and preserve the original slide aspect ratio.
+- Content panel: centered, fully opaque deep GTLC blue (`#061C4C` or close), with a restrained border, shadow, and small orange accent. Do not use translucent glass for the final content area when the user requests solid coverage.
+- Half-size cover panel starting point: about `w=8.2 in`, `h=3.2 in`, centered around `y=2.1 in`; resize from measured content if needed.
+- Half-size closing panel starting point: about `w=7.4 in`, `h=3.3 in`, centered around `y=2.15 in`; resize from measured content if needed.
+- Keep top and bottom padding visually balanced. If a line such as `GTLC 2026 大会赞助结案汇报` does not fit, enlarge the panel before wrapping.
+
 ## Use
 
 - Best for keynote, opening, closing, major section transitions, and strong narrative claims.
