@@ -1,4 +1,4 @@
 interface:
   display_name: "TGO鲲鹏会 PPT 生成 Skill"
-  short_description: "TGO/GTLC PPT 与 HTML 生成，内置 v0.8 排版安全校验"
-  default_prompt: "使用 $gen-tgo-ppt-skill 生成或改造 TGO/GTLC 风格 PPT/HTML：先完成场景、规格、内容和模板澄清，创建生成日志，按 v0.8 排版安全规则生成样片和完整文件；不同 rule 由不同子智能体独立执行，并用 SSOT 合并固定页、首尾页实底面板、项目基本信息页和逐页溢出检查结论。"
+  short_description: "TGO/GTLC PPT 与 HTML 生成，内置 v0.81 排版安全校验"
+  default_prompt: "使用 $gen-tgo-ppt-skill 生成或改造 TGO/GTLC 风格 PPT/HTML：先完成场景、规格、内容和模板澄清，创建生成日志，按 v0.81 排版安全规则生成样片和完整文件；不同 rule 由不同子智能体独立执行，并用 SSOT 合并固定页、首尾页实底面板、项目基本信息页和逐页溢出检查结论。"

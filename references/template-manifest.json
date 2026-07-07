@@ -1,7 +1,7 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
-  "version": "v0.8",
+  "version": "v0.81",
   "protected_notice": {
     "mutable_by_ai": false,
     "title": "重要说明和介绍",
@@ -70,8 +70,8 @@
     "TGO日常活动分享": "tgo-daily"
   },
   "layout_safety": {
-    "version": "v0.8",
-    "policy": "references/rule-layout-safety-v08.md",
+    "version": "v0.81",
+    "policy": "references/rule-layout-safety-v081.md",
     "rule_files": [
       "references/workflow.md",
       "references/rule-intake.md",

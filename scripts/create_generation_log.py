@@ -35,8 +35,8 @@ def main() -> None:
 
     content = f"""# gen-tgo-ppt 生成日志
 
-- Skill 版本：v0.8
-- 排版安全版本：v0.8
+- Skill 版本：v0.81
+- 排版安全版本：v0.81
 - 创建时间：{now.isoformat(timespec="seconds")}
 - 当前目录：`{Path.cwd()}`
 - 任务标题：{args.title}
@@ -89,7 +89,7 @@ def main() -> None:
 
 - 待记录：每一页是否存在样式错乱、无故换行、文本溢出、裁切、Logo/页脚碰撞，并记录修复结果。
 
-## v0.8 排版安全校验
+## v0.81 排版安全校验
 
 - 待记录：`scripts/check_pptx_layout.py` 命令、结果、FAIL/WARN 页面、修复动作与复查结果。
 

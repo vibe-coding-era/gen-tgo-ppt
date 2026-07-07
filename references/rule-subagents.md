@@ -8,7 +8,7 @@
 - `检查风格`
 - `检查文字`
 
-不要在用户可见计划、日志和回复中使用英文 worker 名称。v0.8 起，除这三个基础角色外，所有独立规则都必须有独立规则子智能体。
+不要在用户可见计划、日志和回复中使用英文 worker 名称。v0.81 起，除这三个基础角色外，所有独立规则都必须有独立规则子智能体。
 
 ## 职责
 
@@ -25,7 +25,7 @@
 | `references/rule-intake.md` | `规则-澄清` |
 | `references/rule-ppt-structure.md` | `规则-结构` |
 | `references/rule-template-selection.md` | `规则-模板` |
-| `references/rule-layout-safety-v08.md` | `规则-排版` |
+| `references/rule-layout-safety-v081.md` | `规则-排版` |
 | `references/rule-page-styles.md` | `规则-页型` |
 | `references/rule-validation.md` | `规则-校验` |
 | `references/rule-guardrails.md` | `规则-守护` |
