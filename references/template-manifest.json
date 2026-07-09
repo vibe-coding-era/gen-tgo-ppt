@@ -1,7 +1,7 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
-  "version": "V8.02",
+  "version": "V1",
   "protected_notice": {
     "mutable_by_ai": false,
     "title": "重要说明和介绍",
@@ -84,8 +84,8 @@
     }
   },
   "layout_safety": {
-    "version": "V8.02",
-    "policy": "references/rule-layout-safety-v802.md",
+    "version": "V1",
+    "policy": "references/rule-layout-safety-v1.md",
     "rule_files": [
       "references/workflow.md",
       "references/rule-intake.md",
@@ -100,6 +100,7 @@
       "references/conversion-workflows.md"
     ],
     "checker_script": "scripts/check_pptx_layout.py",
+    "html_checker_script": "scripts/check_html_layout.py",
     "key_page_solid_panel_required": true,
     "key_page_panel_color": "#061C4C",
     "native_cover_exception_requires_user_confirmation": true,
@@ -179,6 +180,7 @@
       "sample_output",
       "final_outputs",
       "pptx_layout_check",
+      "html_layout_check",
       "style_review",
       "text_review",
       "deferred_issues"

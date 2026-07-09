@@ -16,5 +16,6 @@ Then use `references/design/index.md` to load only the selected visual-style `de
 - `6`: `references/design/visual-styles/style-06-minimal-luxury/design.md`
 - `7`: `references/design/visual-styles/style-07-chinese-business/design.md`
 - `8`: `references/design/visual-styles/style-08-creative-festival/design.md`
+- `9`: `references/design/visual-styles/style-09-enterprise-ai-consulting/design.md`
 
-Do not load all style files unless the user explicitly assigns all eight styles.
+Do not load all style files unless the user explicitly assigns all nine styles.

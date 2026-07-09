@@ -1,4 +1,4 @@
-# V8.02 主工作流
+# V1 主工作流
 
 本文件是执行 TGO/GTLC 演示稿任务的主流程。`SKILL.md` 只负责路由，具体规则按阶段加载。
 
@@ -37,9 +37,9 @@
 ## 阶段 3.5：规则子智能体与 SSOT
 
 1. 读取 `references/rule-subagents.md` 和 `references/rule-ssot-handoff.md`。
-2. 为本次已加载的每个 rule 文件分配不同规则子智能体。
-3. 每个规则子智能体独立执行自己的规则，不代替其他规则判断。
-4. 每个规则子智能体按统一交接格式输出 `PASS/WARN/FAIL`、风险、建议和证据。
+2. 为本次已加载的每个 rule 文件分配明确检查责任；可用独立子智能体时优先拆分。
+3. 每个规则检查者独立执行自己的规则，不代替其他规则判断。
+4. 每个规则检查者按统一交接格式输出 `PASS/WARN/FAIL`、风险、建议和证据。
 5. `SSOT-合并` 汇总所有规则交接，形成唯一执行计划、冲突裁决和交付状态。
 6. 如果工具策略不支持创建多个子智能体，必须在 SSOT 和生成日志中记录限制，并以分离自检替代。
 
@@ -72,7 +72,7 @@
 
 ## 阶段 7：检查与返工
 
-1. PPTX 运行 `scripts/check_pptx_layout.py`。
+1. PPTX 运行 `scripts/check_pptx_layout.py`；HTML 运行 `scripts/check_html_layout.py`。
 2. 渲染或预览每一页，生成截图或 contact sheet。
 3. 对所有 `FAIL` 返工；对 `WARN` 人工判断并记录。
 4. 按 `references/rule-validation.md` 做交付检查。

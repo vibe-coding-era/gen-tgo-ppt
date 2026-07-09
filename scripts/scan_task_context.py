@@ -27,6 +27,18 @@ IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"}
 OUTPUT_EXTS = {".pptx", ".pdf", ".html", ".htm", ".webp", ".png", ".jpg", ".jpeg"}
 LOG_PATTERNS = ("gen-tgo-ppt-", "generation-log")
 CHINESE_GENERATION_LOG = "\u751f\u6210\u65e5\u5fd7"
+SOURCE_EXCLUDED_NAMES = {"Design.md", "Content.md", "README.md"}
+LOGO_REJECT_TOKENS = (
+    "contact-sheet",
+    "contactsheet",
+    "preview",
+    "slide-",
+    "page-",
+    "render",
+    "screenshot",
+    "overview",
+    "总览",
+)
 
 
 def utc_now() -> str:
@@ -67,7 +79,28 @@ def iter_files(root: Path, max_files: int):
 
 def looks_like_logo(path: Path) -> bool:
     lower = path.name.lower()
-    return "logo" in lower or "brand" in lower or "gtlc" in lower or "tgo" in lower
+    if any(token in lower for token in LOGO_REJECT_TOKENS):
+        return False
+    stem = path.stem.lower()
+    return "logo" in lower or "brand" in lower or stem in {"gtlc", "tgo"}
+
+
+def is_generation_log_name(name: str) -> bool:
+    lower_name = name.lower()
+    return lower_name.startswith(LOG_PATTERNS) or CHINESE_GENERATION_LOG in name
+
+
+def is_ssot_name(name: str) -> bool:
+    return "ssot" in name.lower()
+
+
+def is_source_candidate(path: Path) -> bool:
+    name = path.name
+    if name in SOURCE_EXCLUDED_NAMES:
+        return False
+    if is_generation_log_name(name) or is_ssot_name(name):
+        return False
+    return path.suffix.lower() in SOURCE_EXTS
 
 
 def classify_file(path: Path, root: Path) -> list[str]:
@@ -80,7 +113,7 @@ def classify_file(path: Path, root: Path) -> list[str]:
         categories.append("design_file")
     if name == "Content.md":
         categories.append("content_file")
-    if ext in SOURCE_EXTS:
+    if is_source_candidate(path):
         categories.append("source_candidate")
     if ext in IMAGE_EXTS:
         categories.append("image")
@@ -94,9 +127,9 @@ def classify_file(path: Path, root: Path) -> list[str]:
         categories.append("machine_report")
     if lower_name.endswith(".pptx.inspect.ndjson"):
         categories.append("pptx_inspect_report")
-    if lower_name.startswith(LOG_PATTERNS) or CHINESE_GENERATION_LOG in name:
+    if is_generation_log_name(name):
         categories.append("generation_log")
-    if "ssot" in lower_name or "ssot" in name:
+    if is_ssot_name(name):
         categories.append("ssot")
 
     return categories
@@ -118,7 +151,7 @@ def rule_hints(categories: dict[str, list[dict]]) -> list[str]:
     if categories.get("logo_candidate"):
         hints.add("references/rule-ppt-structure.md")
     if categories.get("output_candidate"):
-        hints.add("references/rule-layout-safety-v802.md")
+        hints.add("references/rule-layout-safety-v1.md")
         hints.add("references/rule-validation.md")
     if categories.get("generation_log"):
         hints.add("references/generation-log.md")
