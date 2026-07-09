@@ -27,7 +27,8 @@
       "white": "references/design/templates/white/design.md",
       "light": "references/design/templates/light/design.md",
       "dark": "references/design/templates/dark/design.md",
-      "tgo-daily": "references/design/templates/tgo-daily/design.md"
+      "tgo-daily": "references/design/templates/tgo-daily/design.md",
+      "loop-orange-white": "references/design/templates/loop-orange-white/design.md"
     },
     "visual_styles": {
       "1": "references/design/visual-styles/style-01-executive-board/design.md",
@@ -63,11 +64,24 @@
   },
   "template_previews": {
     "contact_sheet": "assets/design/previews/templates/template-contact-sheet.png",
-    "tgo-daily": "assets/design/previews/templates/tgo-daily-template-contact-sheet.png"
+    "tgo-daily": "assets/design/previews/templates/tgo-daily-template-contact-sheet.png",
+    "loop-orange-white-selector": "assets/design/branches/loop-orange-white/tgo-gtlc-style-branches-contact-sheet.png",
+    "loop-orange-white-complete": "assets/design/branches/loop-orange-white/loop-2026-template-complete-contact-sheet.png"
   },
   "template_defaults": {
     "GTLC 大会": "light",
     "TGO日常活动分享": "tgo-daily"
+  },
+  "branch_styles": {
+    "D": {
+      "id": "GTLC-LOOP-OrangeWhite",
+      "name": "LOOP Summit 橙白峰会风",
+      "template_key": "loop-orange-white",
+      "role": "GTLC branch style for AI ecosystem summits, sponsor benefits, city chapter events, and event-facing decks",
+      "selector_pdf": "assets/design/branches/loop-orange-white/tgo-gtlc-style-branches.pdf",
+      "complete_preview_pdf": "assets/design/branches/loop-orange-white/loop-2026-template-complete.pdf",
+      "default_for_gtlc": false
+    }
   },
   "layout_safety": {
     "version": "V8.02",

@@ -6,6 +6,7 @@
 - `assets/design/templates/light/tgo-gtlc-light.pptx`：浅蓝灰内容页，适合多数 GTLC 商务汇报。
 - `assets/design/templates/dark/tgo-gtlc-dark.pptx`：深蓝渐变，适合开场、收尾、章节页和强叙事 keynote。
 - `assets/design/templates/tgo-daily/tgo-daily-sharing-16-9.pptx`：TGO 日常分享模板，适合非 GTLC 场景。
+- `assets/design/branches/loop-orange-white/`：GTLC 分支样式 D，LOOP Summit 橙白峰会风，适合 AI 生态大会、招商权益和活动传播材料。
 
 ## 默认选择
 
@@ -13,10 +14,13 @@
 - `GTLC 大会` 混合内容默认优先 `light`。
 - 密集文字或表格优先 `white`。
 - 短叙事、开场、收尾或视觉冲击页可用 `dark`。
+- 活动峰会、赞助招商、生态传播材料可让用户选择 `D｜LOOP Summit 橙白峰会风`；它是分支样式，不替代 `light`、`white`、`dark` 主模板。
 
 ## 预览资源
 
 - 模板总览：`assets/design/previews/templates/template-contact-sheet.png`
+- GTLC 分支样式选择稿：`assets/design/branches/loop-orange-white/tgo-gtlc-style-branches-contact-sheet.png`
+- LOOP 完整分支模板总览：`assets/design/branches/loop-orange-white/loop-2026-template-complete-contact-sheet.png`
 - 风格编号图：`assets/design/previews/styles/tgo-presentation-design-system-v1.png`
 
 展示风格时允许用户指定“封面用 3，内容页用 1，AI 组织/架构页用 9”这类分页面映射。

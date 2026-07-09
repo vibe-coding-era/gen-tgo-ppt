@@ -1,0 +1,1738 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>LOOP 2026 TGO Complete Template</title>
+  <style>
+    :root {
+      --orange: #f25a00;
+      --orange-dark: #db4700;
+      --orange-soft: #ff8a2a;
+      --cream: #fff8f0;
+      --paper: #fffdf9;
+      --ink: #2d1b12;
+      --muted: #7a6658;
+      --line: #f1c9aa;
+      --pale: #fff2e5;
+      --gray: #f4f1ed;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #e9edf2;
+      color: var(--ink);
+      font-family: "Source Han Sans CN", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      padding: 40px 0;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 42px;
+    }
+
+    .slide {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #fffaf6 0%, #fffdfb 58%, #fff8f0 100%);
+      box-shadow: 0 24px 80px rgba(25, 31, 40, 0.16);
+      isolation: isolate;
+    }
+
+    body.single {
+      overflow: hidden;
+      padding: 0;
+      background: #111;
+    }
+
+    body.single .deck {
+      display: block;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: left top;
+    }
+
+    body.single .slide {
+      display: none;
+      box-shadow: none;
+    }
+
+    body.single .slide.active {
+      display: block;
+    }
+
+    .texture {
+      position: absolute;
+      inset: 0;
+      opacity: 0.08;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 179, 89, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 179, 89, 0.10) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(180deg, transparent 0%, #000 16%, #000 80%, transparent 100%);
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 82px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 0 46px;
+      color: #fff;
+      background: var(--orange);
+    }
+
+    .loop-mark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 310px;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .loop-symbol {
+      position: relative;
+      width: 62px;
+      height: 30px;
+      flex: 0 0 auto;
+    }
+
+    .loop-symbol::before,
+    .loop-symbol::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 30px;
+      height: 30px;
+      border: 9px solid #fff;
+      border-radius: 50%;
+    }
+
+    .loop-symbol::before {
+      left: 0;
+    }
+
+    .loop-symbol::after {
+      right: 0;
+    }
+
+    .bar-line {
+      flex: 1;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.72);
+      position: relative;
+    }
+
+    .bar-line::after {
+      content: "";
+      position: absolute;
+      right: -2px;
+      top: -7px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+    }
+
+    .bar-title,
+    .bar-right {
+      white-space: nowrap;
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .bar-right {
+      min-width: 330px;
+      text-align: right;
+    }
+
+    .top-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      min-width: 296px;
+      height: 54px;
+      padding: 0 22px;
+      border-radius: 999px;
+      color: #050505;
+      background: rgba(255, 255, 255, 0.96);
+    }
+
+    .top-logo .tgo {
+      display: flex;
+      align-items: baseline;
+      font-size: 33px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .top-logo .o {
+      color: var(--orange);
+    }
+
+    .top-logo .kunpeng {
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+      font-family: "Songti SC", "STSong", "SimSun", serif;
+    }
+
+    .content {
+      position: absolute;
+      left: 72px;
+      right: 72px;
+      top: 126px;
+      bottom: 64px;
+      z-index: 2;
+    }
+
+    .page-title {
+      position: absolute;
+      left: 72px;
+      right: 72px;
+      top: 116px;
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .label {
+      display: inline-flex;
+      align-items: center;
+      min-width: 480px;
+      height: 58px;
+      padding: 0 38px;
+      border-radius: 10px 30px 30px 10px;
+      color: #fff;
+      background: var(--orange);
+      font-size: 31px;
+      font-weight: 900;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 8px 20px;
+      border: 1px solid rgba(242, 90, 0, 0.30);
+      border-radius: 999px;
+      color: var(--orange-dark);
+      background: rgba(255, 249, 242, 0.88);
+      font-size: 20px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .panel,
+    .card {
+      border: 1.5px solid rgba(240, 168, 98, 0.32);
+      border-radius: 14px;
+      background: rgba(255, 253, 249, 0.92);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .orange {
+      color: var(--orange);
+    }
+
+    .cover .hero {
+      position: absolute;
+      z-index: 3;
+      top: 158px;
+      left: 190px;
+      right: 190px;
+      text-align: center;
+    }
+
+    .cover-ring {
+      position: absolute;
+      left: 586px;
+      top: 112px;
+      width: 760px;
+      height: 760px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, transparent 43%, rgba(242, 90, 0, 0.08) 44%, transparent 55%),
+        radial-gradient(circle, rgba(255, 189, 85, 0.16), rgba(242, 90, 0, 0.08) 44%, transparent 68%);
+      opacity: 0.65;
+      z-index: 0;
+    }
+
+    .cover-ring::before,
+    .cover-ring::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid rgba(242, 90, 0, 0.12);
+    }
+
+    .cover-ring::before {
+      inset: 88px;
+      border-style: dashed;
+    }
+
+    .cover-ring::after {
+      inset: 150px;
+    }
+
+    .cover-kicker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 86px;
+      padding: 0 52px;
+      border-radius: 16px;
+      color: #fff;
+      background: var(--orange);
+      font-size: 56px;
+      font-weight: 900;
+    }
+
+    .cover .english {
+      margin-top: 30px;
+      color: var(--orange-dark);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .cover h1 {
+      margin: 36px 0 12px;
+      color: var(--orange);
+      font-size: 108px;
+      line-height: 1.04;
+      font-weight: 900;
+    }
+
+    .cover h2 {
+      margin: 0;
+      font-size: 52px;
+      line-height: 1.18;
+      font-weight: 900;
+    }
+
+    .cover-row {
+      margin-top: 34px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .cover-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 56px;
+      padding: 0 40px;
+      border: 2px solid var(--orange);
+      border-radius: 999px;
+      color: var(--orange-dark);
+      background: rgba(255, 253, 250, 0.74);
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .cover-chip.primary {
+      color: #fff;
+      background: var(--orange);
+    }
+
+    .cover .host {
+      margin-top: 25px;
+      font-size: 23px;
+      font-weight: 800;
+    }
+
+    .cover .claim {
+      width: 1040px;
+      margin: 28px auto 0;
+      color: #4c3324;
+      font-size: 24px;
+      line-height: 1.48;
+      font-weight: 650;
+    }
+
+    .intro-layout {
+      top: 196px;
+      display: grid;
+      grid-template-columns: 0.82fr 1.18fr;
+      gap: 32px;
+    }
+
+    .avatar-box {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .avatar {
+      width: 300px;
+      height: 300px;
+      border: 2px dashed rgba(242, 90, 0, 0.28);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(242, 90, 0, 0.55);
+      font-size: 34px;
+      font-weight: 900;
+      background: #fff;
+    }
+
+    .avatar-box h2 {
+      margin: 34px 0 10px;
+      font-size: 44px;
+    }
+
+    .avatar-box p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 25px;
+      line-height: 1.42;
+      font-weight: 700;
+    }
+
+    .intro-info {
+      padding: 44px 50px;
+    }
+
+    .intro-info h2 {
+      margin: 0 0 24px;
+      color: var(--orange-dark);
+      font-size: 42px;
+      font-weight: 900;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 18px;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(240, 168, 98, 0.32);
+      font-size: 25px;
+      line-height: 1.36;
+      font-weight: 700;
+    }
+
+    .info-row span:first-child {
+      color: var(--orange-dark);
+      font-weight: 900;
+    }
+
+    .agenda-layout {
+      top: 196px;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+    }
+
+    .agenda-main,
+    .component-grid {
+      padding: 34px;
+    }
+
+    .slide-heading {
+      margin: 0 0 26px;
+      font-size: 50px;
+      line-height: 1.16;
+      font-weight: 900;
+    }
+
+    .agenda-item {
+      display: grid;
+      grid-template-columns: 184px 1fr;
+      align-items: center;
+      min-height: 86px;
+      border-bottom: 1px solid rgba(240, 168, 98, 0.28);
+    }
+
+    .agenda-time {
+      width: 154px;
+      min-height: 54px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--orange);
+      font-size: 22px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .agenda-copy h3 {
+      margin: 0 0 7px;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .agenda-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 21px;
+      line-height: 1.32;
+      font-weight: 650;
+    }
+
+    .component-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .component-card {
+      padding: 28px 24px;
+    }
+
+    .circle-icon {
+      width: 60px;
+      height: 60px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--orange);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .component-card h3 {
+      margin: 18px 0 9px;
+      font-size: 27px;
+      font-weight: 900;
+    }
+
+    .component-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.38;
+      font-weight: 650;
+    }
+
+    .section-page .center {
+      position: absolute;
+      inset: 82px 0 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 3;
+    }
+
+    .section-number {
+      color: rgba(242, 90, 0, 0.18);
+      font-size: 180px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .section-page h1 {
+      margin: -30px 0 18px;
+      color: var(--orange);
+      font-size: 78px;
+      line-height: 1.12;
+      font-weight: 900;
+    }
+
+    .section-page p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .blank-content {
+      top: 128px;
+      bottom: 66px;
+    }
+
+    .blank-canvas {
+      position: absolute;
+      inset: 0;
+      border: 1.5px dashed rgba(242, 90, 0, 0.24);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.64);
+    }
+
+    .body-layout {
+      top: 196px;
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 30px;
+    }
+
+    .body-left,
+    .body-right {
+      padding: 40px 44px;
+    }
+
+    .body-left h2,
+    .body-right h2 {
+      margin: 0 0 24px;
+      font-size: 40px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .bullets {
+      display: grid;
+      gap: 18px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .bullets li {
+      position: relative;
+      padding-left: 34px;
+      color: #3e2b20;
+      font-size: 26px;
+      line-height: 1.42;
+      font-weight: 700;
+    }
+
+    .bullets li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 13px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .highlight {
+      margin-top: 28px;
+      padding: 24px 28px;
+      border-left: 8px solid var(--orange);
+      border-radius: 12px;
+      background: var(--pale);
+      color: var(--orange-dark);
+      font-size: 25px;
+      line-height: 1.36;
+      font-weight: 900;
+    }
+
+    .two-col {
+      top: 196px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 32px;
+    }
+
+    .compare-card {
+      padding: 42px 44px;
+    }
+
+    .compare-card h2 {
+      margin: 0 0 24px;
+      font-size: 42px;
+      font-weight: 900;
+    }
+
+    .compare-card .tag {
+      display: inline-flex;
+      margin-bottom: 24px;
+      padding: 8px 18px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--orange);
+      font-size: 21px;
+      font-weight: 900;
+    }
+
+    .matrix {
+      top: 196px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .matrix-card {
+      position: relative;
+      padding: 34px 38px 32px 132px;
+    }
+
+    .matrix-card h3 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 900;
+    }
+
+    .matrix-card p {
+      margin: 14px 0 0;
+      color: #4d3729;
+      font-size: 24px;
+      line-height: 1.42;
+      font-weight: 650;
+    }
+
+    .matrix-card em {
+      display: block;
+      margin-top: 18px;
+      color: var(--orange-dark);
+      font-size: 20px;
+      font-style: normal;
+      font-weight: 900;
+    }
+
+    .matrix-card .circle-icon {
+      position: absolute;
+      left: 34px;
+      top: 34px;
+      width: 74px;
+      height: 74px;
+    }
+
+    .data-layout {
+      top: 196px;
+      display: grid;
+      grid-template-columns: 0.92fr 1.08fr;
+      gap: 32px;
+    }
+
+    .big-number {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 42px;
+    }
+
+    .number-main {
+      color: var(--orange);
+      font-size: 116px;
+      line-height: 0.92;
+      font-weight: 900;
+    }
+
+    .number-main span {
+      color: var(--orange-dark);
+      font-size: 48px;
+    }
+
+    .number-caption {
+      margin-top: 18px;
+      color: var(--orange-dark);
+      font-size: 29px;
+      font-weight: 900;
+    }
+
+    .number-copy {
+      align-self: center;
+      width: 90%;
+      color: #3e2b20;
+      font-size: 24px;
+      line-height: 1.54;
+      font-weight: 650;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .metric {
+      min-height: 104px;
+      border-radius: 14px;
+      color: #fff;
+      background: var(--orange);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .metric b {
+      font-size: 38px;
+      line-height: 1;
+    }
+
+    .metric span {
+      margin-top: 8px;
+      font-size: 20px;
+    }
+
+    .chart-panel {
+      padding: 30px 36px;
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      align-items: center;
+      gap: 28px;
+      overflow: hidden;
+    }
+
+    .donut {
+      position: relative;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      background: conic-gradient(var(--orange) 0 50%, #f6a35b 50% 80%, #ffe0c1 80% 100%);
+      box-shadow: inset 0 0 0 20px rgba(255, 255, 255, 0.82);
+    }
+
+    .donut::before {
+      content: "";
+      position: absolute;
+      inset: 110px;
+      border-radius: 50%;
+      background: var(--paper);
+      box-shadow: inset 0 0 0 1px rgba(240, 168, 98, 0.36);
+    }
+
+    .donut-center {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--orange);
+      font-size: 38px;
+      font-weight: 900;
+    }
+
+    .donut-label {
+      position: absolute;
+      color: #fff;
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .donut-label.a {
+      top: 58px;
+      left: 160px;
+    }
+
+    .donut-label.b {
+      left: 62px;
+      bottom: 104px;
+    }
+
+    .donut-label.c {
+      right: 62px;
+      bottom: 62px;
+      color: var(--orange-dark);
+    }
+
+    .legend-list,
+    .bar-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .legend-item {
+      display: grid;
+      grid-template-columns: 20px 80px 1fr;
+      align-items: start;
+      gap: 14px;
+    }
+
+    .dot {
+      width: 20px;
+      height: 20px;
+      margin-top: 12px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .dot.mid {
+      background: #f6a35b;
+    }
+
+    .dot.light {
+      background: #ffd9b4;
+    }
+
+    .legend-percent {
+      color: var(--orange);
+      font-size: 32px;
+      font-weight: 900;
+    }
+
+    .legend-copy h3 {
+      margin: 0 0 8px;
+      font-size: 23px;
+      font-weight: 900;
+    }
+
+    .legend-copy p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.36;
+      font-weight: 650;
+    }
+
+    .bar-list {
+      margin-top: 18px;
+      gap: 10px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 160px 1fr 66px;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .bar-track {
+      height: 20px;
+      border-radius: 999px;
+      background: #fdebd8;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: inherit;
+      background: var(--orange);
+    }
+
+    .timeline {
+      top: 196px;
+      padding: 52px 56px;
+    }
+
+    .timeline-line {
+      position: absolute;
+      left: 140px;
+      right: 140px;
+      top: 440px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(242, 90, 0, 0.20);
+    }
+
+    .steps {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 24px;
+      margin-top: 112px;
+    }
+
+    .step {
+      text-align: center;
+    }
+
+    .step-num {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: var(--orange);
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .step h3 {
+      margin: 0 0 10px;
+      font-size: 27px;
+      font-weight: 900;
+    }
+
+    .step p {
+      margin: 0 auto;
+      max-width: 230px;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.38;
+      font-weight: 650;
+    }
+
+    .image-info {
+      top: 196px;
+      display: grid;
+      grid-template-columns: 1.12fr 0.88fr;
+      gap: 32px;
+    }
+
+    .image-placeholder {
+      position: relative;
+      border: 1.5px dashed rgba(242, 90, 0, 0.28);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(242, 90, 0, 0.10), rgba(255, 189, 85, 0.14)),
+        #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(242, 90, 0, 0.56);
+      font-size: 42px;
+      font-weight: 900;
+    }
+
+    .project-info {
+      padding: 42px 42px;
+    }
+
+    .project-info h2 {
+      margin: 0 0 26px;
+      color: var(--orange-dark);
+      font-size: 40px;
+      font-weight: 900;
+    }
+
+    .quote-page .quote-box {
+      position: absolute;
+      left: 220px;
+      right: 220px;
+      top: 220px;
+      text-align: center;
+    }
+
+    .quote-page h1 {
+      margin: 0;
+      color: var(--orange);
+      font-size: 76px;
+      line-height: 1.18;
+      font-weight: 900;
+      font-family: "Songti SC", "STSong", "SimSun", serif;
+    }
+
+    .quote-page p {
+      width: 1080px;
+      margin: 34px auto 0;
+      color: #4d3729;
+      font-size: 30px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .takeaways {
+      position: absolute;
+      left: 160px;
+      right: 160px;
+      bottom: 120px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .takeaway {
+      min-width: 0;
+      padding: 26px 28px;
+      text-align: center;
+    }
+
+    .takeaway h3 {
+      margin: 0 0 8px;
+      color: var(--orange-dark);
+      font-size: 27px;
+      font-weight: 900;
+    }
+
+    .takeaway p {
+      width: auto;
+      margin: 0;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.36;
+      font-weight: 650;
+    }
+
+    .sponsor-layout {
+      top: 196px;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr) 170px;
+      gap: 18px;
+    }
+
+    .tiers {
+      display: grid;
+      grid-template-rows: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .tier-row {
+      display: grid;
+      grid-template-columns: 255px 1fr;
+      overflow: hidden;
+    }
+
+    .tier-name {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 34px;
+      color: #fff;
+      background: var(--orange);
+    }
+
+    .tier-name strong {
+      font-size: 33px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .tier-name span {
+      margin-top: 8px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .tier-content {
+      padding: 15px 30px 14px;
+    }
+
+    .tier-content h3 {
+      margin: 0 0 11px;
+      color: var(--orange-dark);
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .benefits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px 24px;
+    }
+
+    .benefit {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 190px;
+      color: #352319;
+      font-size: 19px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .check {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--orange);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .speaker-panel {
+      overflow: hidden;
+    }
+
+    .speaker-head {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: var(--orange);
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    .speaker-body {
+      height: 122px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: rgba(255, 253, 249, 0.86);
+    }
+
+    .speaker-benefit {
+      display: grid;
+      grid-template-columns: 62px 1fr;
+      align-items: center;
+      gap: 15px;
+      padding: 18px 24px;
+      border-right: 1px solid rgba(240, 168, 98, 0.36);
+    }
+
+    .speaker-benefit:last-child {
+      border-right: 0;
+    }
+
+    .speaker-benefit .circle-icon {
+      width: 58px;
+      height: 58px;
+    }
+
+    .speaker-benefit h3 {
+      margin: 0 0 7px;
+      color: var(--orange-dark);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .speaker-benefit p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.34;
+      font-weight: 650;
+    }
+
+    .thanks .center {
+      position: absolute;
+      z-index: 3;
+      left: 180px;
+      right: 180px;
+      top: 185px;
+      text-align: center;
+    }
+
+    .thanks h1 {
+      margin: 0;
+      color: var(--orange);
+      font-size: 104px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .thanks .center p {
+      width: 1050px;
+      margin: 32px auto 0;
+      color: #4a2f20;
+      font-size: 32px;
+      line-height: 1.5;
+      font-weight: 750;
+      font-family: "Songti SC", "STSong", "SimSun", serif;
+    }
+
+    .contact-bar {
+      position: absolute;
+      z-index: 4;
+      left: 150px;
+      right: 150px;
+      bottom: 176px;
+      height: 118px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      overflow: hidden;
+    }
+
+    .contact-item {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      align-items: center;
+      gap: 18px;
+      padding: 20px 38px;
+      border-right: 1px solid rgba(240, 168, 98, 0.36);
+      color: #302018;
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    .contact-item:last-child {
+      border-right: 0;
+    }
+
+    .contact-icon {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: var(--orange);
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .contact-item small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 20px;
+      font-weight: 650;
+    }
+
+    .footer-logos {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 54px;
+      background: #f1f2f4;
+      color: #383838;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .footer-logos strong {
+      font-size: 34px;
+      color: var(--orange);
+    }
+
+    @media print {
+      body {
+        padding: 0;
+        background: #fff;
+      }
+
+      .deck {
+        gap: 0;
+      }
+
+      .slide {
+        box-shadow: none;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-label="LOOP 2026 TGO 完整模板">
+    <section class="slide cover" data-slide="1">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">AI Ecosystem</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">AI驱动 · 工程落地 · 生态共赢</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="cover-ring"></div>
+      <div class="hero">
+        <div class="cover-kicker">LOOP 2026 · 全球AI生态与创新峰会</div>
+        <div class="english">AI Ecosystem and Innovation Summit | 2026</div>
+        <h1>AI生产力跃升</h1>
+        <h2>从可用到可靠，让 AI 真正交付</h2>
+        <div class="cover-row">
+          <div class="cover-chip">TGO鲲鹏会北京分会 十一周年庆（11th）</div>
+          <div class="cover-chip primary">2026年8月8日（周六）· 北京</div>
+        </div>
+        <div class="host">主办方：TGO鲲鹏会北京分会</div>
+        <div class="claim">我们正站在 AI 从“问答”走向“执行”的临界点，Agent 正在从工具变为伙伴，推动组织与业务的生产力跃迁。</div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="2">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Guest Intro</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">嘉宾介绍 · 讲师信息 · 主题方向</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">嘉宾介绍</div>
+        <div class="pill">固定页｜标题页后第 2 页</div>
+      </div>
+      <div class="content intro-layout">
+        <div class="panel avatar-box">
+          <div class="avatar">头像 / 照片</div>
+          <h2>嘉宾姓名</h2>
+          <p>公司 / 职务 / 技术领域</p>
+        </div>
+        <div class="panel intro-info">
+          <h2>分享主题</h2>
+          <div class="info-row"><span>主题</span><div>从可用到可靠，让 AI 真正交付</div></div>
+          <div class="info-row"><span>背景</span><div>面向 CTO、技术 VP、架构师与 AI 工程实践者</div></div>
+          <div class="info-row"><span>经历</span><div>可填写核心履历、代表项目、行业影响力与公开成果</div></div>
+          <div class="info-row"><span>亮点</span><div>一句话说明听众为什么应该关注这场分享</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="3">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Agenda</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">大会导航 · 议程页 · 汇报导航</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">大会导航与版式节奏</div>
+        <div class="pill">适用：目录页 / 议程页 / 汇报导航</div>
+      </div>
+      <div class="content agenda-layout">
+        <div class="panel agenda-main">
+          <h1 class="slide-heading">一页交代 <span class="orange">会议结构</span></h1>
+          <div class="agenda-item"><div class="agenda-time">Day 0<br>14:00-22:00</div><div class="agenda-copy"><h3>欢迎晚宴 / 精酿会 / 社群破冰</h3><p>把会前社交从寒暄变成议题预热。</p></div></div>
+          <div class="agenda-item"><div class="agenda-time">Day 1<br>09:00-12:00</div><div class="agenda-copy"><h3>主论坛 Keynote 分享</h3><p>聚焦 Agent 稳定可控运转、工程落地与生态协同。</p></div></div>
+          <div class="agenda-item"><div class="agenda-time">Day 1<br>14:00-18:00</div><div class="agenda-copy"><h3>四大平行分论坛</h3><p>A 基础设施与运行时 / B Harness 工程 / C 组织进化 / D 垂直应用。</p></div></div>
+          <div class="agenda-item"><div class="agenda-time">Day 1<br>19:00-21:00</div><div class="agenda-copy"><h3>科技领袖闭门会与晚宴</h3><p>面向 CTO、技术 VP、创始人与 AI Builders 的深度连接。</p></div></div>
+        </div>
+        <div class="panel component-grid">
+          <div class="card component-card"><div class="circle-icon">01</div><h3>章节条</h3><p>用于每页快速建立大会识别，保持模板统一。</p></div>
+          <div class="card component-card"><div class="circle-icon">AI</div><h3>简约能量环</h3><p>只在封面、章节和总结页轻量出现。</p></div>
+          <div class="card component-card"><div class="circle-icon">500</div><h3>数据仪表盘</h3><p>适合大会规模、人群画像和赛道分布。</p></div>
+          <div class="card component-card"><div class="circle-icon">CO</div><h3>合作转化区</h3><p>适合招商、权益、联系方式与合作露出。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide section-page" data-slide="4">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Section</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">章节页 · 转场页 · 大标题页</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="center">
+        <div class="section-number">01</div>
+        <h1>AI 生产力跃升</h1>
+        <p>从主题切换到内容正文，用一页建立章节节奏。</p>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Blank Page</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">空白页 · 自定义内容 · 大图页面</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="content blank-content">
+        <div class="blank-canvas"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="6">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Content</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">标题正文 · 观点页 · 通用内容</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">通用标题正文页</div>
+        <div class="pill">适用：观点讲解 / 方案阐述 / 结论展开</div>
+      </div>
+      <div class="content body-layout">
+        <div class="panel body-left">
+          <h2>核心观点</h2>
+          <ul class="bullets">
+            <li>AI 的交付瓶颈正在从模型能力转向工程系统。</li>
+            <li>可靠执行需要上下文、工具、验证和持续反馈闭环。</li>
+            <li>组织需要保留判断力，而不是把理解完全交给自动化。</li>
+          </ul>
+          <div class="highlight">可替换为本页最重要的一句话结论。</div>
+        </div>
+        <div class="panel body-right">
+          <h2>展开说明</h2>
+          <ul class="bullets">
+            <li>把复杂内容控制在 3-5 条，保证大屏可读。</li>
+            <li>每条正文建议不超过两行，避免信息密度过高。</li>
+            <li>保留顶部 Logo 与页眉区域，不放置正文。</li>
+            <li>右侧可替换为图表、截图、流程或案例。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="7">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Compare</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">双栏对比 · Before After · 两类方案</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">双栏对比页</div>
+        <div class="pill">适用：现状 vs 目标 / 方案 A vs B</div>
+      </div>
+      <div class="content two-col">
+        <div class="panel compare-card">
+          <span class="tag">当前状态</span>
+          <h2>工具堆叠，交付不稳定</h2>
+          <ul class="bullets">
+            <li>依赖人工补救和临时经验。</li>
+            <li>评估体系不稳定，难以复用。</li>
+            <li>组织无法判断系统是否真正进步。</li>
+          </ul>
+        </div>
+        <div class="panel compare-card">
+          <span class="tag">目标状态</span>
+          <h2>工程闭环，结果可验证</h2>
+          <ul class="bullets">
+            <li>执行、验证、反馈形成闭环。</li>
+            <li>关键指标可观察、可回放、可复盘。</li>
+            <li>团队保留决策权和技术判断力。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="8">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Matrix</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">议题地图 · 四象限 · 分论坛</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">四大核心议题方向</div>
+        <div class="pill">适用：分论坛页 / 主题地图 / 章节页</div>
+      </div>
+      <div class="content matrix">
+        <div class="card matrix-card"><div class="circle-icon">R1</div><h3>执行前沿与基建</h3><p>高阶技术底座、Agent 运行时与企业级基础设施。</p><em>面向：基础设施执行与管理者</em></div>
+        <div class="card matrix-card"><div class="circle-icon">&lt;/&gt;</div><h3>工程范式更替</h3><p>Harness 工程、上下文管理、跨越工程鸿沟。</p><em>面向：前沿基础与应用实践者</em></div>
+        <div class="card matrix-card"><div class="circle-icon">ORG</div><h3>变革与共识</h3><p>AI 原生研发、组织进化、信任机制与权力重构。</p><em>面向：技术管理者</em></div>
+        <div class="card matrix-card"><div class="circle-icon">APP</div><h3>垂直工程落地</h3><p>行业应用、自主闭环验证与工程化重构。</p><em>面向：业务落地实践者</em></div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="9">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Data</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">大会规模 · 人群画像 · 赛道分布</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">大会规模与高价值人群画像</div>
+        <div class="pill">适用：数据页 / 招商证明 / 开场介绍</div>
+      </div>
+      <div class="content data-layout">
+        <div class="panel big-number">
+          <div><div class="number-main">500<span>人+</span></div><div class="number-caption">参会规模（核准 / 邀请制）</div></div>
+          <div class="number-copy">严格筛选嘉宾，均为具备企业 IT 预算决策权的高净值科技先锋与 AI Builders。</div>
+          <div class="metric-row"><div class="metric"><b>5年+</b><span>技术经验</span></div><div class="metric"><b>20人+</b><span>团队规模</span></div><div class="metric"><b>78.2%</b><span>决策高管</span></div></div>
+        </div>
+        <div class="panel chart-panel">
+          <div class="donut"><div class="donut-label a">50%</div><div class="donut-label b">30%</div><div class="donut-label c">20%</div><div class="donut-center">人群</div></div>
+          <div>
+            <div class="legend-list">
+              <div class="legend-item"><span class="dot"></span><div class="legend-percent">50%</div><div class="legend-copy"><h3>CTO / 研发副总裁 / 首席架构师</h3><p>掌握 AI 工程化投入与技术路线选择。</p></div></div>
+              <div class="legend-item"><span class="dot mid"></span><div class="legend-percent">30%</div><div class="legend-copy"><h3>技术背景 CEO / 创始人 / 科创合伙人</h3><p>关注业务增长、组织升级与 AI 产品化。</p></div></div>
+              <div class="legend-item"><span class="dot light"></span><div class="legend-percent">20%</div><div class="legend-copy"><h3>投资人 / 教授学者 / 数字化转型专家</h3><p>连接资本、研究与行业落地场景。</p></div></div>
+            </div>
+            <div class="bar-list">
+              <div class="bar-row"><span>云与算力基建</span><span class="bar-track"><span class="bar-fill" style="width: 86%;"></span></span><b>18.9%</b></div>
+              <div class="bar-row"><span>企业服务 SaaS</span><span class="bar-track"><span class="bar-fill" style="width: 72%;"></span></span><b>15.1%</b></div>
+              <div class="bar-row"><span>AI 与安全</span><span class="bar-track"><span class="bar-fill" style="width: 66%;"></span></span><b>14.1%</b></div>
+              <div class="bar-row"><span>IT 服务制造</span><span class="bar-track"><span class="bar-fill" style="width: 60%;"></span></span><b>13.0%</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="10">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Timeline</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">流程页 · 时间线 · 路线图</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">工程落地流程</div>
+        <div class="pill">适用：路线图 / 方法论 / 交付步骤</div>
+      </div>
+      <div class="content panel timeline">
+        <h1 class="slide-heading">从议题到落地的五步闭环</h1>
+        <div class="timeline-line"></div>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><h3>定义问题</h3><p>明确目标、边界、用户和可验证指标。</p></div>
+          <div class="step"><div class="step-num">02</div><h3>组织上下文</h3><p>整理数据、工具、流程与角色分工。</p></div>
+          <div class="step"><div class="step-num">03</div><h3>构建 Harness</h3><p>把模型能力接入可控执行系统。</p></div>
+          <div class="step"><div class="step-num">04</div><h3>运行评估</h3><p>自动化验证结果，记录成功与失败。</p></div>
+          <div class="step"><div class="step-num">05</div><h3>沉淀复用</h3><p>把有效机制写入流程、模板与组织经验。</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="11">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Image + Info</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">现场图 · 项目截图 · 基本信息</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">图片与项目信息页</div>
+        <div class="pill">适用：现场照片 / 产品截图 / 案例展示</div>
+      </div>
+      <div class="content image-info">
+        <div class="image-placeholder">图片 / 截图占位</div>
+        <div class="panel project-info">
+          <h2>项目基本信息</h2>
+          <div class="info-row"><span>主题</span><div>LOOP 2026 · 全球 AI 生态与创新峰会</div></div>
+          <div class="info-row"><span>时间</span><div>2026年8月8日（周六）· 北京</div></div>
+          <div class="info-row"><span>人群</span><div>CTO、技术 VP、创始人、AI Builders</div></div>
+          <div class="info-row"><span>场景</span><div>大会介绍、招商材料、项目复盘与成果展示</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide quote-page" data-slide="12">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Summary</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">金句页 · 总结页 · 关键结论</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="quote-box">
+        <h1>AI 护城河不在模型大小，<br>而在可靠交付的工程系统。</h1>
+        <p>当组织把执行、验证、反馈和复用沉淀为机制，AI 才能从“可用”走向“可靠”。</p>
+      </div>
+      <div class="takeaways">
+        <div class="card takeaway"><h3>可控执行</h3><p>让模型输出进入明确的工程边界。</p></div>
+        <div class="card takeaway"><h3>自动验证</h3><p>用证据判断系统是否真实进步。</p></div>
+        <div class="card takeaway"><h3>组织复用</h3><p>把经验沉淀为下一次交付的起点。</p></div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="13">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Sponsor</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">招商权益 · 讲师权益 · 合作方案</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="page-title">
+        <div class="label">赞助方案与权益总览</div>
+        <div class="pill">适用：招商页 / 权益页 / 合作方案</div>
+      </div>
+      <div class="content sponsor-layout">
+        <div class="tiers">
+          <div class="panel tier-row"><div class="tier-name"><strong>TIER 1</strong><span>PLATINUM</span></div><div class="tier-content"><h3>白金共创（最高档）</h3><div class="benefits"><span class="benefit"><span class="check">✓</span>活动门票及晚宴席位</span><span class="benefit"><span class="check">✓</span>品牌 Logo 露出</span><span class="benefit"><span class="check">✓</span>主论坛圆桌席位</span><span class="benefit"><span class="check">✓</span>多渠道 Logo 曝光</span><span class="benefit"><span class="check">✓</span>高端独立展位</span></div></div></div>
+          <div class="panel tier-row"><div class="tier-name"><strong>TIER 2</strong><span>GOLD</span></div><div class="tier-content"><h3>金牌共创</h3><div class="benefits"><span class="benefit"><span class="check">✓</span>会后联合复盘文章</span><span class="benefit"><span class="check">✓</span>标准展位</span><span class="benefit"><span class="check">✓</span>分论坛演讲席位</span><span class="benefit"><span class="check">✓</span>多渠道曝光</span></div></div></div>
+          <div class="panel tier-row"><div class="tier-name"><strong>TIER 3</strong><span>SILVER</span></div><div class="tier-content"><h3>高级共创</h3><div class="benefits"><span class="benefit"><span class="check">✓</span>活动门票及晚宴席位</span><span class="benefit"><span class="check">✓</span>主持人口播感谢</span><span class="benefit"><span class="check">✓</span>会后复盘提及权益</span></div></div></div>
+          <div class="panel tier-row"><div class="tier-name"><strong>TIER 4</strong><span>CITY</span></div><div class="tier-content"><h3>城市共创（入门档）</h3><div class="benefits"><span class="benefit"><span class="check">✓</span>活动门票及晚宴席位</span><span class="benefit"><span class="check">✓</span>品牌 Logo 露出</span><span class="benefit"><span class="check">✓</span>会后联合复盘文章</span></div></div></div>
+        </div>
+        <div class="panel speaker-panel">
+          <div class="speaker-head">讲师专属权益（Speaker Benefits）</div>
+          <div class="speaker-body">
+            <div class="speaker-benefit"><div class="circle-icon">STG</div><div><h3>顶级舞台曝光</h3><p>登上主论坛或分论坛舞台，面向核心技术圈层。</p></div></div>
+            <div class="speaker-benefit"><div class="circle-icon">NET</div><div><h3>高端人脉链接</h3><p>参与讲师午宴、科技领袖晚宴与闭门研讨。</p></div></div>
+            <div class="speaker-benefit"><div class="circle-icon">REP</div><div><h3>社区背书沉淀</h3><p>进入 TGO 鲲鹏会技术领袖网络，沉淀个人公信力。</p></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide thanks" data-slide="14">
+      <div class="texture"></div>
+      <div class="topbar">
+        <div class="loop-mark"><span class="loop-symbol"></span><span>LOOP Summit 2026</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Thanks</div>
+        <div class="bar-line"></div>
+        <div class="bar-right">AI驱动 · 工程落地 · 生态共赢</div>
+        <div class="top-logo"><span class="tgo"><span>T</span><span class="o">G</span><span>O</span></span><span class="kunpeng">鲲鹏会</span></div>
+      </div>
+      <div class="center">
+        <h1>感谢聆听</h1>
+        <p>期待与富有远见的科技领导者及合作伙伴同行，在 Agent 交付落地元年共谱新章。</p>
+      </div>
+      <div class="panel contact-bar">
+        <div class="contact-item"><div class="contact-icon">人</div><div>TGO 北京分会<small>运营经理 · 郭超群</small></div></div>
+        <div class="contact-item"><div class="contact-icon">电</div><div>158-4566-3388<small>微信同号</small></div></div>
+        <div class="contact-item"><div class="contact-icon">信</div><div>tgo@geekbang.com<small>讲师申报 & 合作接洽</small></div></div>
+      </div>
+      <div class="footer-logos">
+        <span>战略合作媒体</span><strong>InfoQ</strong><span>极客传媒</span>
+        <span>独家合作学习平台</span><strong>Q</strong><span>极客时间</span>
+        <span>AI 应用共创</span><strong>A</strong><span>模力工场</span>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("slide");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+
+    function fitSingleSlide() {
+      if (!document.body.classList.contains("single")) return;
+      const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      const deck = document.querySelector(".deck");
+      deck.style.transform = `scale(${scale})`;
+      document.body.style.width = `${1920 * scale}px`;
+      document.body.style.height = `${1080 * scale}px`;
+    }
+
+    if (requested) {
+      document.body.classList.add("single");
+      slides.forEach((slide) => {
+        slide.classList.toggle("active", slide.dataset.slide === requested);
+      });
+      fitSingleSlide();
+      window.addEventListener("resize", fitSingleSlide);
+    }
+  </script>
+</body>
+</html>

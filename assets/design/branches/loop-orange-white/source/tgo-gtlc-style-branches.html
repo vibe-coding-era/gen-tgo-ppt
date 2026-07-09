@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TGO GTLC Style Branches</title>
+  <style>
+    :root {
+      --blue: #001e64;
+      --blue-2: #033886;
+      --blue-soft: #e9f0fb;
+      --orange: #f25a00;
+      --orange-dark: #d94a00;
+      --paper: #fffdf9;
+      --ink: #15213a;
+      --muted: #65708a;
+      --line: rgba(0, 30, 100, 0.14);
+      --orange-line: rgba(242, 90, 0, 0.24);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-height: 100%;
+      background: #e7ecf4;
+      color: var(--ink);
+      font-family: "Source Han Sans CN", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      padding: 40px 0;
+    }
+
+    .deck {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 42px;
+    }
+
+    .slide {
+      position: relative;
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f8fbff 0%, #ffffff 58%, #f6f8fb 100%);
+      box-shadow: 0 26px 84px rgba(25, 36, 62, 0.16);
+      isolation: isolate;
+    }
+
+    body.single {
+      overflow: hidden;
+      padding: 0;
+      background: #111;
+    }
+
+    body.single .deck {
+      display: block;
+      width: 1920px;
+      height: 1080px;
+      transform-origin: left top;
+    }
+
+    body.single .slide {
+      display: none;
+      box-shadow: none;
+    }
+
+    body.single .slide.active {
+      display: block;
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 10;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 86px;
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      padding: 0 48px;
+      color: #fff;
+      background: var(--blue);
+    }
+
+    .top-mark {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-width: 330px;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .mark-dot {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: var(--blue);
+      background: #fff;
+      font-size: 20px;
+      font-weight: 950;
+    }
+
+    .bar-line {
+      height: 2px;
+      flex: 1;
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .bar-title {
+      min-width: 220px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .top-logo {
+      min-width: 276px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border-radius: 999px;
+      color: var(--blue);
+      background: #fff;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .gtlc {
+      letter-spacing: 0;
+      font-size: 25px;
+      font-weight: 950;
+    }
+
+    .gtlc .o {
+      color: var(--orange);
+    }
+
+    .content {
+      position: absolute;
+      z-index: 3;
+      left: 94px;
+      right: 94px;
+      top: 148px;
+      bottom: 78px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 26px;
+      border-radius: 999px;
+      color: #fff;
+      background: var(--orange);
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 28px 0 0;
+      color: var(--blue);
+      font-size: 72px;
+      line-height: 1.08;
+      font-weight: 950;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--blue);
+      font-size: 40px;
+      line-height: 1.18;
+      font-weight: 930;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 31px;
+      line-height: 1.28;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 25px;
+      line-height: 1.45;
+      font-weight: 650;
+    }
+
+    .lead {
+      width: 980px;
+      margin-top: 28px;
+      color: #34415f;
+      font-size: 31px;
+      line-height: 1.48;
+      font-weight: 720;
+    }
+
+    .panel,
+    .card {
+      border: 1.6px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .selector-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+      margin-top: 56px;
+    }
+
+    .style-card {
+      min-height: 462px;
+      display: flex;
+      flex-direction: column;
+      padding: 34px 32px;
+      border-top: 9px solid var(--blue);
+    }
+
+    .style-card.loop {
+      border-color: var(--orange);
+      background: linear-gradient(180deg, #fffaf6 0%, #fff 72%);
+      box-shadow: inset 0 0 0 1px var(--orange-line);
+    }
+
+    .style-code {
+      width: 62px;
+      height: 62px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--blue);
+      font-size: 28px;
+      font-weight: 950;
+    }
+
+    .loop .style-code {
+      background: var(--orange);
+    }
+
+    .style-card h3 {
+      margin-top: 28px;
+      font-size: 36px;
+    }
+
+    .style-card p {
+      margin-top: 18px;
+      min-height: 108px;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .tag {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 16px;
+      border-radius: 999px;
+      color: var(--blue);
+      background: var(--blue-soft);
+      font-size: 19px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+
+    .loop .tag {
+      color: var(--orange-dark);
+      background: #fff1e8;
+    }
+
+    .branch-layout {
+      display: grid;
+      grid-template-columns: 0.94fr 1.06fr;
+      gap: 38px;
+    }
+
+    .branch-hero {
+      position: relative;
+      padding: 54px 52px;
+      overflow: hidden;
+      background: linear-gradient(160deg, #fffaf5 0%, #fff 52%, #edf4ff 100%);
+    }
+
+    .branch-hero::after {
+      content: "";
+      position: absolute;
+      right: -120px;
+      bottom: -150px;
+      width: 470px;
+      height: 470px;
+      border: 34px solid rgba(242, 90, 0, 0.12);
+      border-radius: 50%;
+    }
+
+    .branch-hero h1 {
+      position: relative;
+      z-index: 2;
+      margin-top: 34px;
+      color: var(--orange);
+      font-size: 76px;
+    }
+
+    .branch-hero .lead {
+      position: relative;
+      z-index: 2;
+      width: auto;
+      max-width: 710px;
+    }
+
+    .branch-points {
+      display: grid;
+      gap: 22px;
+    }
+
+    .point {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      align-items: start;
+      gap: 22px;
+      padding: 28px 32px;
+    }
+
+    .point-num {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: var(--orange);
+      font-size: 22px;
+      font-weight: 950;
+    }
+
+    .point p {
+      margin-top: 8px;
+    }
+
+    .preview-layout {
+      display: grid;
+      grid-template-columns: 1.04fr 0.96fr;
+      gap: 28px;
+      height: 100%;
+    }
+
+    .large-preview {
+      padding: 24px;
+    }
+
+    .large-preview img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 1px solid rgba(242, 90, 0, 0.18);
+    }
+
+    .thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 1fr;
+      gap: 18px;
+    }
+
+    .thumb {
+      overflow: hidden;
+      padding: 14px;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid rgba(0, 30, 100, 0.10);
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1.02fr 0.98fr;
+      gap: 36px;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .choice-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 210px;
+      gap: 20px;
+      align-items: center;
+      padding: 24px 28px;
+    }
+
+    .choice-row strong {
+      color: var(--blue);
+      font-size: 29px;
+      font-weight: 940;
+    }
+
+    .choice-row.loop {
+      border-color: var(--orange-line);
+      background: #fffaf6;
+    }
+
+    .choice-row.loop strong,
+    .choice-row.loop .result {
+      color: var(--orange-dark);
+    }
+
+    .result {
+      color: var(--blue-2);
+      text-align: right;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .decision-panel {
+      padding: 42px 44px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+    }
+
+    .decision-panel ul {
+      margin: 28px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 22px;
+    }
+
+    .decision-panel li {
+      position: relative;
+      padding-left: 34px;
+      color: #34415f;
+      font-size: 28px;
+      line-height: 1.45;
+      font-weight: 720;
+    }
+
+    .decision-panel li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 15px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .system-map {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+      margin-top: 50px;
+    }
+
+    .system-card {
+      min-height: 198px;
+      padding: 32px;
+    }
+
+    .system-card h3 {
+      color: var(--blue);
+      font-size: 34px;
+    }
+
+    .system-card p {
+      margin-top: 12px;
+    }
+
+    .system-card.highlight {
+      border-color: var(--orange-line);
+      background: linear-gradient(180deg, #fffaf6 0%, #fff 100%);
+    }
+
+    .system-card.highlight h3 {
+      color: var(--orange-dark);
+    }
+
+    .footer-note {
+      position: absolute;
+      left: 94px;
+      right: 94px;
+      bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      color: #7d879d;
+      font-size: 18px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <main class="deck">
+    <section class="slide" data-slide="1">
+      <div class="topbar">
+        <div class="top-mark"><span class="mark-dot">T</span><span>TGO GTLC Template System</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Style Choice</div>
+        <div class="bar-line"></div>
+        <div class="top-logo"><span class="gtlc">TG<span class="o">O</span> GTLC</span></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow">给客户选择的样式入口</div>
+        <h1>TGO GTLC 模板库<br>新增 LOOP 峰会分支样式</h1>
+        <p class="lead">GTLC 保持正式、清晰、科技商务的主模板体系；LOOP 大会视觉作为一个更有峰会感、传播感和招商感的分支选项。</p>
+        <div class="selector-grid">
+          <div class="card style-card">
+            <div class="style-code">A</div>
+            <h3>GTLC Light</h3>
+            <p>浅蓝灰商务底，适合大多数大会汇报、议程说明和项目介绍。</p>
+            <div class="tag-row"><span class="tag">默认主模板</span><span class="tag">商务稳健</span><span class="tag">综合内容</span></div>
+          </div>
+          <div class="card style-card">
+            <div class="style-code">B</div>
+            <h3>GTLC White</h3>
+            <p>白底高可读版，适合报告、表格、密集材料和打印留档。</p>
+            <div class="tag-row"><span class="tag">高可读</span><span class="tag">数据密集</span><span class="tag">可打印</span></div>
+          </div>
+          <div class="card style-card">
+            <div class="style-code">C</div>
+            <h3>GTLC Dark</h3>
+            <p>深蓝 keynote 版，适合开场、章节、战略发布和收尾。</p>
+            <div class="tag-row"><span class="tag">强开场</span><span class="tag">高仪式感</span><span class="tag">Keynote</span></div>
+          </div>
+          <div class="card style-card loop">
+            <div class="style-code">D</div>
+            <h3>LOOP Summit</h3>
+            <p>橙白峰会分支，适合 AI 生态、招商权益、活动长图转演示和传播型页面。</p>
+            <div class="tag-row"><span class="tag">分支样式</span><span class="tag">峰会传播</span><span class="tag">招商适配</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note"><span>Branch ID: GTLC-LOOP-OrangeWhite</span><span>建议作为 D 选项呈现</span></div>
+    </section>
+
+    <section class="slide" data-slide="2">
+      <div class="topbar">
+        <div class="top-mark"><span class="mark-dot">D</span><span>TGO GTLC Branch Style</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">LOOP Branch</div>
+        <div class="bar-line"></div>
+        <div class="top-logo"><span class="gtlc">TG<span class="o">O</span> GTLC</span></div>
+      </div>
+      <div class="content branch-layout">
+        <div class="panel branch-hero">
+          <div class="eyebrow">分支样式 D</div>
+          <h1>LOOP 橙白峰会风</h1>
+          <p class="lead">从 LOOP Summit 2026 长图中提炼橙色品牌条、白底信息卡、圆环动势和数据权益模块，转成 16:9 可演示模板。</p>
+        </div>
+        <div class="branch-points">
+          <div class="card point">
+            <div class="point-num">01</div>
+            <div><h3>适用场景</h3><p>AI 生态大会、峰会招商、城市分会活动、合作伙伴宣发、活动介绍材料。</p></div>
+          </div>
+          <div class="card point">
+            <div class="point-num">02</div>
+            <div><h3>视觉特征</h3><p>橙色置顶品牌条、右上角 Logo、白底大留白、轻量圆环、权益表和数据看板。</p></div>
+          </div>
+          <div class="card point">
+            <div class="point-num">03</div>
+            <div><h3>选择边界</h3><p>不替代 GTLC 主模板；正式报告、密集表格和董事会材料优先选择 Light 或 White。</p></div>
+          </div>
+          <div class="card point">
+            <div class="point-num">04</div>
+            <div><h3>交付状态</h3><p>当前已完成 14 页分支模板 PDF，可作为客户选择前的效果图和版型样张。</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="3">
+      <div class="topbar">
+        <div class="top-mark"><span class="mark-dot">D</span><span>LOOP Branch Preview</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Preview</div>
+        <div class="bar-line"></div>
+        <div class="top-logo"><span class="gtlc">TG<span class="o">O</span> GTLC</span></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow">分支样式预览</div>
+        <div class="preview-layout" style="margin-top: 28px; height: 728px;">
+          <div class="panel large-preview">
+            <img src="../loop-2026-template-effects/complete-previews/loop-2026-template-complete-slide-01.png" alt="LOOP branch cover preview">
+          </div>
+          <div class="thumb-grid">
+            <div class="card thumb"><img src="../loop-2026-template-effects/complete-previews/loop-2026-template-complete-slide-02.png" alt="Guest intro preview"></div>
+            <div class="card thumb"><img src="../loop-2026-template-effects/complete-previews/loop-2026-template-complete-slide-05.png" alt="Blank page preview"></div>
+            <div class="card thumb"><img src="../loop-2026-template-effects/complete-previews/loop-2026-template-complete-slide-09.png" alt="Data page preview"></div>
+            <div class="card thumb"><img src="../loop-2026-template-effects/complete-previews/loop-2026-template-complete-slide-13.png" alt="Sponsor page preview"></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note"><span>引用已生成的 LOOP 分支 14 页模板效果图</span><span>用于客户快速判断风格</span></div>
+    </section>
+
+    <section class="slide" data-slide="4">
+      <div class="topbar">
+        <div class="top-mark"><span class="mark-dot">?</span><span>GTLC Style Decision Guide</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">Decision</div>
+        <div class="bar-line"></div>
+        <div class="top-logo"><span class="gtlc">TG<span class="o">O</span> GTLC</span></div>
+      </div>
+      <div class="content guide-grid">
+        <div>
+          <div class="eyebrow">用户选择建议</div>
+          <h1 style="font-size: 64px;">按材料目标<br>选择主模板或分支样式</h1>
+          <div class="choice-list" style="margin-top: 42px;">
+            <div class="card choice-row"><strong>正式介绍</strong><p>大会背景、组织介绍、合作说明、通用汇报。</p><div class="result">选 A Light</div></div>
+            <div class="card choice-row"><strong>密集报告</strong><p>数据表、预算表、执行计划、复盘报告。</p><div class="result">选 B White</div></div>
+            <div class="card choice-row"><strong>战略发布</strong><p>开场、收尾、关键主题发布、舞台 keynote。</p><div class="result">选 C Dark</div></div>
+            <div class="card choice-row loop"><strong>活动传播</strong><p>峰会宣发、AI 生态、招商权益、社区活动包装。</p><div class="result">选 D LOOP</div></div>
+          </div>
+        </div>
+        <div class="panel decision-panel">
+          <h2>给客户的说明口径</h2>
+          <ul>
+            <li>GTLC 主模板用于保证品牌一致性和正式场景可信度。</li>
+            <li>LOOP 分支用于需要更强活动感、传播感和橙色峰会识别的材料。</li>
+            <li>同一份 PPT 可混用：封面/章节用 Dark，正文用 Light，招商页用 LOOP 分支。</li>
+            <li>客户确认分支后，再把内容套入对应 14 页版型并输出正式 PPTX。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-slide="5">
+      <div class="topbar">
+        <div class="top-mark"><span class="mark-dot">S</span><span>TGO GTLC Style System</span></div>
+        <div class="bar-line"></div>
+        <div class="bar-title">System Map</div>
+        <div class="bar-line"></div>
+        <div class="top-logo"><span class="gtlc">TG<span class="o">O</span> GTLC</span></div>
+      </div>
+      <div class="content">
+        <div class="eyebrow">模板库结构更新</div>
+        <h1>LOOP 不再作为单独大会模板，<br>而是纳入 GTLC 的分支样式选择。</h1>
+        <div class="system-map">
+          <div class="card system-card"><h3>GTLC 主模板 A：Light</h3><p>默认商务版，用于大部分客户材料。</p></div>
+          <div class="card system-card"><h3>GTLC 主模板 B：White</h3><p>密集报告版，用于数据、表格和打印。</p></div>
+          <div class="card system-card"><h3>GTLC 主模板 C：Dark</h3><p>强叙事版，用于封面、章节和 keynote。</p></div>
+          <div class="card system-card highlight"><h3>GTLC 分支 D：LOOP Orange White</h3><p>活动峰会版，用于 AI 生态大会、招商权益和传播材料。</p></div>
+        </div>
+      </div>
+      <div class="footer-note"><span>选择完成后进入内容套版阶段</span><span>保留 GTLC 品牌一致性，允许 LOOP 分支承载活动情绪</span></div>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const requested = params.get("slide");
+    const slides = Array.from(document.querySelectorAll(".slide"));
+
+    function fitSingleSlide() {
+      if (!document.body.classList.contains("single")) return;
+      const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      const deck = document.querySelector(".deck");
+      deck.style.transform = `scale(${scale})`;
+      document.body.style.width = `${1920 * scale}px`;
+      document.body.style.height = `${1080 * scale}px`;
+    }
+
+    if (requested) {
+      document.body.classList.add("single");
+      slides.forEach((slide) => {
+        slide.classList.toggle("active", slide.dataset.slide === requested);
+      });
+      fitSingleSlide();
+      window.addEventListener("resize", fitSingleSlide);
+    }
+  </script>
+</body>
+</html>
