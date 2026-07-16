@@ -1,7 +1,11 @@
 {
   "name": "gen-tgo-ppt-skill",
   "author": "肉山",
+  "manifest_type": "template_bundle",
   "version": "V1",
+  "version_semantics": "legacy alias for template_bundle_version; not the Skill contract version",
+  "template_bundle_version": "V1",
+  "skill_manifest": "references/skill-manifest.json",
   "protected_notice": {
     "mutable_by_ai": false,
     "title": "重要说明和介绍",
@@ -87,7 +91,9 @@
     "version": "V1",
     "policy": "references/rule-layout-safety-v1.md",
     "rule_files": [
+      "references/rule-routing-and-modes.md",
       "references/workflow.md",
+      "references/rule-failure-recovery.md",
       "references/rule-intake.md",
       "references/rule-ppt-structure.md",
       "references/rule-template-selection.md",
@@ -144,27 +150,36 @@
     "style_review": {
       "name": "检查风格",
       "scope": "visual fidelity only",
-      "must_differ_from_generation_subagent": true
+      "must_differ_from_generation_when_independent_lanes_required": true
     },
     "text_review": {
       "name": "检查文字",
       "scope": "Chinese wording, content quality, and source fidelity only",
-      "must_differ_from_generation_subagent": true
+      "must_differ_from_generation_when_independent_lanes_required": true
     }
   },
   "subagent_policy": {
-    "generation_and_validation_must_be_different": true,
-    "generation_subagent": "生成内容",
-    "validation_subagents": ["检查风格", "检查文字"],
+    "default_execution": "single_agent_with_separated_review_passes",
+    "independent_lanes": ["生成内容", "检查风格", "检查文字"],
+    "activate_independent_lanes_when": [
+      "formal_external_delivery",
+      "high_risk_overwrite_or_batch_change",
+      "three_applicable_separable_lanes_with_clear_merge_criteria"
+    ],
+    "generation_and_validation_must_be_different_when_independent_lanes_required": true,
     "forbidden": [
       "same_subagent_generates_and_validates_same_output",
       "generation_subagent_approves_own_deck",
-      "validation_subagent_validates_content_it_generated"
+      "validation_subagent_validates_content_it_generated",
+      "claiming_independent_validation_for_same_context_self_review",
+      "one_subagent_per_loaded_rule_by_default"
     ],
-    "fallback_when_subagents_unavailable": "record limitation in generation log and run separated lead self-review passes without claiming independent subagent validation"
+    "fallback_when_subagents_unavailable": "record limitation and run separated lead self-review passes labeled non-independent"
   },
   "generation_log": {
-    "required": true,
+    "required_modes": ["create", "convert", "major_repair"],
+    "optional_modes": ["check_only", "minor_repair"],
+    "not_applicable_modes": ["handoff"],
     "location": "current_working_directory",
     "filename_pattern": "gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md",
     "create_before": "one_page_sample_or_full_output",
@@ -190,42 +205,49 @@
     {
       "id": "progressive_design_loading_after_clarification",
       "actor": "lead",
+      "applies_to": ["repair", "convert", "create"],
       "requires_user_confirmation": false
     },
     {
       "id": "content_discussion_after_source_read",
       "actor": "lead",
+      "applies_to": ["convert", "create", "repair_when_content_changes"],
       "requires_user_confirmation": true
     },
     {
       "id": "deck_plan_with_page_count_and_per_slide_outline",
       "actor": "lead",
+      "applies_to": ["convert", "create", "major_repair"],
       "requires_user_confirmation": true
     },
     {
       "id": "generation_log_in_current_directory",
       "actor": "lead",
+      "applies_to": ["convert", "create", "major_repair"],
       "requires_user_confirmation": false,
       "required_before": "one_page_sample_or_full_output"
     },
     {
       "id": "one_page_sample_confirmation",
       "actor": "lead",
+      "applies_to": ["convert", "create", "repair_when_visual_direction_changes"],
       "requires_user_confirmation": true
     },
     {
       "id": "generation_subagent_assignment",
-      "actor": "separate_subagent",
+      "actor": "lead_or_independent_lane",
       "subagent_name": "生成内容",
       "requires_user_confirmation": false,
-      "scope": "sample_and_full_output_generation"
+      "scope": "sample_and_full_output_generation",
+      "conditional": "independent_lane_policy"
     },
     {
       "id": "subagent_separation",
       "actor": "lead",
       "requires_user_confirmation": false,
       "required_before": "independent_style_review",
-      "rule": "generation_subagent_must_differ_from_validation_subagents"
+      "rule": "generation_context_must_differ_from_validation_context_when_independent_lanes_required",
+      "conditional": "independent_lane_policy"
     },
     {
       "id": "pptx_layout_check_and_fail_fix",
@@ -239,7 +261,8 @@
       "subagent_name": "检查风格",
       "order": 1,
       "before": "independent_content_review",
-      "scope": "visual_fidelity_only"
+      "scope": "visual_fidelity_only",
+      "conditional": "independent_lane_policy"
     },
     {
       "id": "independent_content_review",
@@ -247,7 +270,8 @@
       "subagent_name": "检查文字",
       "order": 2,
       "after": "independent_style_review",
-      "scope": "chinese_wording_content_quality_and_source_fidelity_only"
+      "scope": "chinese_wording_content_quality_and_source_fidelity_only",
+      "conditional": "independent_lane_policy"
     }
   ],
   "canvas": {

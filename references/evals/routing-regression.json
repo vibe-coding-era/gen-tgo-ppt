@@ -1,0 +1,161 @@
+{
+  "schema_version": "gen-tgo-ppt-routing-eval-v1.1",
+  "corpus_version": "V1.1",
+  "split": "regression",
+  "counterpart_corpus": "routing-holdout.json",
+  "thresholds": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "mode_accuracy": 1.0,
+    "specificity": 1.0,
+    "handoff_accuracy": 1.0
+  },
+  "cases": [
+    {
+      "case_id": "regression-create-001",
+      "prompt": "请根据本目录中的 Design.md 和 Content.md，从头生成一份 16:9 的 GTLC 风格大会复盘 PPT，并输出可编辑 PPTX。",
+      "prompt_sha256": "6631d179362882e2fddc40fc4d8386ef8d150cadb1c960972962311d04521263",
+      "split": "regression",
+      "case_type": "create",
+      "attachments": [
+        {
+          "name": "Design.md",
+          "media_type": "text/markdown",
+          "role": "design_source"
+        },
+        {
+          "name": "Content.md",
+          "media_type": "text/markdown",
+          "role": "content_source"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "create",
+      "expected_handoff": null,
+      "tags": ["positive", "from-scratch", "workspace-sources"],
+      "provenance": {
+        "authoring_role": "implementation_regression",
+        "sealed": false,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "regression-convert-001",
+      "prompt": "把我附上的《大会复盘.md》转换成 GTLC 风格 PPT，保留原文事实与六页结构。",
+      "prompt_sha256": "469472d387e3f5660f72fb80da186c503afed3392626d805bf4a7357258ebade",
+      "split": "regression",
+      "case_type": "convert",
+      "attachments": [
+        {
+          "name": "大会复盘.md",
+          "media_type": "text/markdown",
+          "role": "conversion_source"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "convert",
+      "expected_handoff": null,
+      "tags": ["positive", "conversion", "markdown"],
+      "provenance": {
+        "authoring_role": "implementation_regression",
+        "sealed": false,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "regression-repair-001",
+      "prompt": "这份 GTLC 演示稿出现标题溢出和末页缺失，请直接修复附件 PPTX，并给出修复后的文件。",
+      "prompt_sha256": "2fb5dd73e7be9fd61a60b40f0f1f0ab4c2485eaa0dd86f643d10266f7efa1014",
+      "split": "regression",
+      "case_type": "repair",
+      "attachments": [
+        {
+          "name": "gtlc-overflow.pptx",
+          "media_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "role": "repair_target"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "repair",
+      "expected_handoff": null,
+      "tags": ["positive", "repair", "layout"],
+      "provenance": {
+        "authoring_role": "implementation_regression",
+        "sealed": false,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "regression-check-only-001",
+      "prompt": "只检查附件《季度复盘.pptx》的版式、文字和 GTLC 风格，不要修改任何文件，输出问题清单即可。",
+      "prompt_sha256": "8b0ece8ca1f85fb00dd7377f79d6d81436974be1f5df9b34c7048bc365809cff",
+      "split": "regression",
+      "case_type": "check_only",
+      "attachments": [
+        {
+          "name": "季度复盘.pptx",
+          "media_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "role": "read_only_target"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "check_only",
+      "expected_handoff": null,
+      "tags": ["positive", "check-only", "no-write"],
+      "provenance": {
+        "authoring_role": "implementation_regression",
+        "sealed": false,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "regression-no-trigger-001",
+      "prompt": "请分析这份 Excel 销售数据，计算各区域同比增长，并生成一个新的 XLSX 工作簿。",
+      "prompt_sha256": "6cc8e31d05234214afa7e5ecc156081d9cc67098203fde0b983e49cff5b2b5c6",
+      "split": "regression",
+      "case_type": "no_trigger",
+      "attachments": [
+        {
+          "name": "sales.xlsx",
+          "media_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          "role": "spreadsheet_source"
+        }
+      ],
+      "expected_route": "no_trigger",
+      "expected_mode": null,
+      "expected_handoff": null,
+      "tags": ["negative", "spreadsheet", "out-of-scope"],
+      "provenance": {
+        "authoring_role": "implementation_regression",
+        "sealed": false,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "regression-handoff-001",
+      "prompt": "请把这份季度复盘内容发布成一个可交互的网站并部署到公网域名，不需要 PPT 或演示稿。",
+      "prompt_sha256": "8618340b67e9a5eaba74cb36254f72f041832a8d6c19fdb8863c4efc68f18c7f",
+      "split": "regression",
+      "case_type": "handoff",
+      "attachments": [
+        {
+          "name": "quarterly-review.md",
+          "media_type": "text/markdown",
+          "role": "website_content"
+        }
+      ],
+      "expected_route": "handoff",
+      "expected_mode": null,
+      "expected_handoff": {
+        "targets": ["sites"],
+        "reason_contains": ["网站", "部署"]
+      },
+      "tags": ["handoff", "website", "deployment"],
+      "provenance": {
+        "authoring_role": "implementation_regression",
+        "sealed": false,
+        "failure_prompt": false
+      }
+    }
+  ]
+}

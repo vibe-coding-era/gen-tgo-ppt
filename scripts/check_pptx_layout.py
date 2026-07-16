@@ -6,12 +6,26 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from pptx import Presentation
-from pptx.enum.shapes import MSO_SHAPE_TYPE
+Presentation = None
+MSO_SHAPE_TYPE = None
+
+
+def load_pptx_dependency() -> bool:
+    """Load python-pptx after CLI parsing so isolated --help stays usable."""
+    global Presentation, MSO_SHAPE_TYPE
+    try:
+        from pptx import Presentation as _Presentation
+        from pptx.enum.shapes import MSO_SHAPE_TYPE as _MSO_SHAPE_TYPE
+    except ImportError:
+        return False
+    Presentation = _Presentation
+    MSO_SHAPE_TYPE = _MSO_SHAPE_TYPE
+    return True
 
 EMU_PER_IN = 914400
 EMU_PER_PT = 12700
@@ -866,6 +880,14 @@ def main() -> None:
     parser.add_argument("--overlap-ratio", type=float, default=0.08)
     parser.add_argument("--bounds-tolerance-emu", type=int, default=1000)
     args = parser.parse_args()
+
+    if not load_pptx_dependency():
+        print(
+            "E_DEPENDENCY_MISSING: python-pptx is required for PPTX layout checks; "
+            "install distribution 'python-pptx' and retry.",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
 
     results = [check_pptx(path, args) for path in args.pptx]
     if args.json:

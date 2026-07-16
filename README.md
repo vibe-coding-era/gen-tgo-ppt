@@ -1,216 +1,161 @@
-# TGO鲲鹏会 GTLC/日常分享 PPT/HTML 演示稿生成 Skill
+# TGO鲲鹏会 GTLC/日常分享 PPTX/HTML Skill
 
-作者：肉山@TGO 杭州分会
-版本：V1
-Skill 名称：`gen-tgo-ppt-skill`
+- 作者：肉山@TGO 杭州分会
+- Skill 版本：V1.1
+- 模板包 / 排版安全版本：V1
+- Skill 名称：`gen-tgo-ppt-skill`
 
-这是一个用于生成、改造和校验 TGO 鲲鹏会、GTLC 大会与日常分享材料的 Codex Skill。它可以把 PPT、PDF、Markdown、HTML、粘贴文本或现有演示稿，整理成符合 TGO/GTLC 风格的 PPTX 或 HTML 演示稿。
+这是一个用于生成、转换、修复和校验 TGO 鲲鹏会、GTLC 大会与日常分享演示材料的 Codex Skill。它接受 PPT、PDF、Markdown、HTML、粘贴文本或既有演示稿，输出 PPTX、HTML 和相应检查证据。
 
-本 README 是给使用者和维护者看的简版说明；执行细则以 `SKILL.md`、`references/` 和 `scripts/` 为准。
+README 面向使用者和维护者；执行入口以 `SKILL.md` 为准，机器事实以 `references/skill-manifest.json` 为准，模板资产事实以 `references/template-manifest.json` 为准。
 
-## 适用场景
+## V1.1 的变化
+
+- 入口同时声明正触发、负触发和加载后的 handoff 边界。
+- 增加 `check_only`、`repair`、`convert`、`create`、`handoff` 五种模式。
+- 单 Agent 为默认；正式或高风险交付再启用独立的生成、风格、文字通道。
+- 增加失败分类、稳定错误码、重试上限和安全写入合同。
+- 增加 Skill manifest，明确 Python、第三方发行包、脚本副作用和宿主能力。
+- 增加回归/holdout 语料与评测器，明确区分结构 fixture 与真实模型行为。
+- `run_v11_skill_checks.py` 成为当前 Harness；`run_v1_skill_checks.py` 保留为单向兼容入口。
+- V1.1 不改变模板资产、排版几何阈值或现有 PPTX/HTML 检查算法。
+
+## 何时使用
+
+适用：
 
 - GTLC 大会复盘、议程、招商、权益、项目汇报和董事会材料。
-- TGO 鲲鹏会日常活动分享、主题演讲、会员交流和城市分会内容。
-- 既有 PPT 套模板、优化版式、修复文字溢出、统一视觉风格。
-- 从 Markdown、HTML、PDF 或粘贴内容生成新的 PPT/HTML 演示稿。
-- 需要生成日志、样片确认、逐页渲染校验和交付证据链的正式材料。
+- TGO 日常活动分享、主题演讲、会员交流和城市分会内容。
+- 既有 PPTX 套模板、修复版式、统一 TGO/GTLC 风格或只读审计。
+- 从 PDF、Markdown、HTML 或文本生成/转换 PPTX 或 HTML 演示稿。
 
-## 核心能力
+不适用：普通文章写作、Excel/Word 处理、通用海报/网页设计、仅阅读 PDF，或完全不涉及 TGO/GTLC 演示稿的任务。这些任务不应触发本 Skill；若已加载后才发现越界，使用 `handoff`。
 
-- 内容讨论：先澄清场景、目标、受众、规格、模板、风格和输出格式。
-- 模板套版：支持 GTLC 主模板、TGO 日常分享模板和 LOOP Summit 橙白分支样式。
-- PPT/HTML 输出：可生成 PPTX，也可生成 HTML 演示稿。
-- 渐进式加载：按任务只读取需要的规则、模板和风格文件，降低上下文负担。
-- 固定页规则：PPT 默认包含标题页后的 `嘉宾介绍` 页和末尾 `感谢聆听` 页。
-- 多角色检查：生成内容、检查风格、检查文字尽量由不同子智能体或分离步骤完成。
-- 质量校验：通过脚本检查 PPTX/HTML 版型、文本溢出、重叠、Logo/页脚碰撞等问题。
-- 生成日志：每次正式生成前创建并维护 `gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md`。
+## 五种模式
 
-## 输入与输出
+| 模式 | 用途 | 默认写入 | 日志/SSOT |
+| --- | --- | --- | --- |
+| `check_only` | 只读检查、审计、评价 | 不写源文件 | 默认不强制；正式审计可创建 |
+| `repair` | 修复既有 PPTX/HTML | 默认写新版本文件 | 重大修复需要日志，正式/高风险需要 SSOT |
+| `convert` | 来源格式转成 PPTX/HTML | 创建新产物 | 日志必需，正式/高风险需要 SSOT |
+| `create` | 从主题、提纲或素材新建 | 创建新产物 | 日志必需，正式/高风险需要 SSOT |
+| `handoff` | 已加载后发现能力越界 | 不写演示稿 | 只给移交摘要 |
 
-常见输入：
+## 核心能力与模板
 
-- `Design.md`：场景、规格、风格、模板、Logo、输出格式等设计决策。
-- `Content.md`：主题、提纲、正文、讲稿、页面结构或原始材料。
-- `.pptx`：现有演示稿，可选择改内容并套模板，或只套模板不改内容。
-- `.pdf`、`.md`、`.html`、粘贴文本：可转成 PPTX/HTML 演示稿。
-- Logo、图片、截图、参考样式：可作为品牌或视觉素材使用。
+- 渐进式加载场景、模板、视觉风格和规则，避免一次性灌入全部上下文。
+- 支持 `white`、`light`、`dark`、`tgo-daily`、`loop-orange-white` 模板。
+- 内置九类视觉风格，可按页组合。
+- 新建/转换 PPTX 默认包含标题页后的 `嘉宾介绍` 页和末尾 `感谢聆听` 页。
+- 提供 PPTX/HTML 静态检查、内容预算、任务上下文扫描和检查报告压缩脚本。
+- 对正式/高风险任务使用 `生成内容`、`检查风格`、`检查文字` 独立通道；工具不可用时只声明分离自检。
 
-常见输出：
-
-- PPTX 演示稿。
-- HTML 演示稿。
-- 渲染预览图或总览图。
-- 生成日志。
-- PPTX/HTML 检查报告。
-- SSOT 交接记录或任务证据文档。
-
-## 内置模板与风格
-
-主模板：
-
-- `white`：白底内容页，适合正式文档、打印和密集内容。
-- `light`：浅蓝灰内容页，适合多数 GTLC 商务汇报。
-- `dark`：深蓝渐变，适合开场、收尾、章节页和强叙事 keynote。
-- `tgo-daily`：TGO 日常分享模板，适合非 GTLC 日常活动。
-- `loop-orange-white`：LOOP Summit 橙白峰会风，适合 AI 生态大会、招商权益和活动传播材料。
-
-视觉风格：
-
-- 内置 9 类风格：董事会汇报、硅谷科技、大厂 Keynote、AI Native、数据智能、极简高级、中国商务、创意节庆、企业 AI 咨询。
-- 可以按页面混用，例如“封面用 3，内容页用 1，AI 架构页用 9”。
-
-## 如何使用
-
-在 Codex 中直接说明要使用本 Skill，并给出材料或目标。例如：
+## 使用示例
 
 ```text
-使用 $gen-tgo-ppt-skill，把 Content.md 生成一份 GTLC 大会复盘 PPT，风格偏董事会汇报，输出 PPTX。
+使用 $gen-tgo-ppt-skill，把 Content.md 生成一份 GTLC 大会复盘 PPTX，董事会汇报风格。
 ```
 
 ```text
-使用 $gen-tgo-ppt-skill，把这个 PPT 套成 TGO 日常分享模板，只改版式，不改内容。
+使用 $gen-tgo-ppt-skill，只检查这个季度汇报 PPT 的版式和文字，不要修改文件。
 ```
 
 ```text
-使用 $gen-tgo-ppt-skill，根据这段文字生成 HTML 演示稿，适合 TGO 杭州分会日常分享。
+使用 $gen-tgo-ppt-skill，把现有 PPT 套成 TGO 日常分享模板，只改版式，不改内容。
 ```
 
-推荐提供的信息：
+推荐提供用途、输出格式、规格、内容来源、模板/视觉偏好和 Logo 决定。Skill 只追问无法从材料推断且会改变产物的问题。
 
-- 用途：GTLC 大会、TGO 日常分享、招商材料、复盘汇报等。
-- 输出：PPTX、HTML，或两者都要。
-- 规格：16:9、页数范围、是否需要演讲稿。
-- 内容：主题、提纲、正文、已有文件或粘贴材料。
-- 风格：模板 key、视觉风格编号、参考图或参考 PPT。
-- Logo：是否使用默认 GTLC/TGO Logo，是否替换为上传 Logo。
+## 执行与质量门禁
 
-执行流程：
+生成或重大修改的典型流程：模式选择 → 最小澄清 → 页纲/预算 → 日志 → 样片 → 完整产物 → 静态检查 → 逐页渲染 → 返工 → 交付。
 
-1. Codex 先说启动语，并询问缺失的关键选择。
-2. 按需创建或补齐 `Design.md` 和 `Content.md`。
-3. 选择场景、模板、视觉风格和输出格式。
-4. 生成页面计划和样片。
-5. 样片确认后生成完整 PPTX/HTML。
-6. 运行版型检查脚本并逐页复核。
-7. 更新生成日志，交付最终文件和检查结论。
+关键门禁：
 
-## 质量标准
+- 默认保留来源，覆盖或批量写入需预览、确认、执行和事后核对。
+- 修复所有未批准的检查器 `FAIL`，并人工判断 `WARN`。
+- 逐页检查溢出、裁切、重叠、异常换行、字号、Logo/页脚和固定页。
+- 无法渲染时标记降级，不能把静态检查写成视觉质量验证。
+- 结构 fixture、真实模型路由和真实产物质量是三种不同证据。
 
-交付前至少满足：
+## 脚本
 
-- 已创建并更新生成日志。
-- 已按需加载独立规则文件，没有把所有上下文一次性塞入。
-- PPTX 输出通过 `scripts/check_pptx_layout.py`，HTML 输出通过 `scripts/check_html_layout.py`。
-- 每页已预览或渲染检查，处理文本溢出、裁切、重叠、Logo/页脚碰撞。
-- 固定页顺序正确，标题页后有 `嘉宾介绍` 页，末尾有 `感谢聆听` 页。
-- 风格检查和文字检查与生成步骤分离；无法使用独立子智能体时，需要在日志里说明。
+先把 `SKILL_DIR` 指向 Skill 根目录，再从任务目录执行：
+
+```bash
+python -B "$SKILL_DIR/scripts/scan_task_context.py" . --output task-context.json
+python -B "$SKILL_DIR/scripts/content_budget.py" Content.md --format markdown
+python -B "$SKILL_DIR/scripts/create_generation_log.py" --mode create --title "演示稿标题" --dry-run
+python -B "$SKILL_DIR/scripts/check_pptx_layout.py" output.pptx
+python -B "$SKILL_DIR/scripts/check_html_layout.py" output.html
+python -B "$SKILL_DIR/scripts/inspect_pptx_style.py" source.pptx
+python -B "$SKILL_DIR/scripts/summarize_layout_report.py" layout-check.json --format markdown
+```
+
+当前维护门禁：
+
+```bash
+python -B scripts/run_v11_skill_checks.py
+python -B scripts/run_v11_skill_checks.py --temp-root /path/to/existing-writable-dir
+```
+
+Harness 默认依次使用 `GEN_TGO_PPT_TEMP_ROOT` 和系统临时目录；显式路径必须已经存在且可写。若没有可写临时目录，无写入检查仍会执行，但依赖 fixture 写入的门禁会标为 `INSUFFICIENT`，进程返回 `3`，不会把未执行项算成 PASS。
+
+V1 兼容入口仍可用，但只会委托当前 V1.1 Harness：
+
+```bash
+python -B scripts/run_v1_skill_checks.py
+python -B scripts/run_v1_skill_checks.py --temp-root /path/to/existing-writable-dir
+```
+
+路由评测示例：
+
+```bash
+python -B scripts/evaluate_v11_contract.py \
+  references/evals/routing-regression.json \
+  references/evals/evaluator-smoke-observations-regression.json
+```
+
+fixture PASS 只证明评测器和语料结构自洽，不证明真实模型行为。行为结论必须来自隔离上下文的真实观察；结果质量结论还必须有真实输出和渲染证据。
 
 ## 如何增加新模板
 
-新增模板时，要同步模板资产、设计说明、索引、模板选择规则、manifest 和验证脚本。推荐使用短横线 key，例如 `sponsor-blue`、`city-roadshow`。
-
 ### 方式 A：在 Codex 中加入
 
-把模板文件交给 Codex，并说明模板 key、适用场景和默认使用条件。示例：
+把模板文件交给 Codex，并说明模板 key、适用场景和默认条件，例如：
 
 ```text
-请把 /path/to/new-template.pptx 加入 gen-tgo-ppt-skill，模板 key 为 sponsor-blue。
-适用于 GTLC 大会赞助招商材料，默认不替代 light/white/dark。
-请生成设计说明，更新索引、manifest、模板选择规则，并运行 V1 Harness。
+请把 /path/to/new-template.pptx 加入 gen-tgo-ppt-skill，key 为 sponsor-blue；
+适用于 GTLC 招商材料，不替代 light/white/dark。请更新设计说明、索引、manifest，并运行 V1.1 Harness。
 ```
 
-Codex 应完成：
-
-1. 复制 PPTX 到 `assets/design/templates/<template-key>/`。
-2. 检查 PPTX 尺寸、母版、版式、字体、颜色、Logo、页脚和背景资产。
-3. 创建 `references/design/templates/<template-key>/design.md`。
-4. 更新 `references/design/index.md` 的模板加载路由。
-5. 更新 `references/rule-template-selection.md` 的模板资产、默认选择或适用场景。
-6. 更新 `references/template-manifest.json` 的 `design_resources.templates` 和 `templates`。
-7. 如需展示，补充 `assets/design/previews/templates/` 下的预览图或 contact sheet。
-8. 如新增场景或分支样式，按需更新 `SKILL.md` 的渐进式加载索引和相关 rule 文件。
-9. 运行 V1 校验：
-
-```bash
-python /Users/Rou/.codex/skills/gen-tgo-ppt-skill/scripts/run_v1_skill_checks.py
-```
+Codex 应完成：复制资产、检查母版/版式/字体/颜色/Logo/页脚、创建模板 `design.md`、更新设计索引和模板选择规则、更新 template manifest、补充预览（若需要），最后运行 Harness 和真实 PPTX 检查。
 
 ### 方式 B：直接放入文件夹
 
-先按固定目录放入模板文件和设计说明，再让 Codex 或维护者补齐索引。
-
-推荐目录：
+推荐结构：
 
 ```text
-assets/design/templates/<template-key>/
-  <template-key>.pptx
-
-references/design/templates/<template-key>/
-  design.md
+assets/design/templates/<template-key>/<template-key>.pptx
+references/design/templates/<template-key>/design.md
 ```
 
-`design.md` 至少写清：
-
-```markdown
-# <Template Name> Template Design
-
-## Asset
-
-- PPTX: `assets/design/templates/<template-key>/<template-key>.pptx`
-- Visual role:
-- Default scene:
-- Not default for:
-
-## Layouts
-
-- `<layout name>`:
-
-## Key Positions
-
-- Cover title:
-- Default content title:
-- Default content body:
-- Logo:
-- Footer:
-
-## Use
-
-- Best for:
-- Avoid for:
-- Validation notes:
-```
-
-放入文件后，必须更新：
+`design.md` 至少写清资产路径、视觉角色、默认/避免场景、版式、关键位置和验证说明。随后更新：
 
 - `references/design/index.md`
 - `references/rule-template-selection.md`
 - `references/template-manifest.json`
-- 必要时更新 `SKILL.md`、`agents/openai.yaml`、`references/generation-log.md`
+- 必要时更新 `SKILL.md` 的渐进加载路由
 
-然后运行验证：
+新增模板不能改写或移动 `SKILL.md` 中的受保护说明段；模板产物仍需通过 PPTX 检查与真实渲染复核。
 
-```bash
-python /Users/Rou/.codex/skills/gen-tgo-ppt-skill/scripts/inspect_pptx_style.py assets/design/templates/<template-key>/<template-key>.pptx
-python /Users/Rou/.codex/skills/gen-tgo-ppt-skill/scripts/run_v1_skill_checks.py
-```
+## 维护与发布边界
 
-## 新模板验收标准
-
-- 模板文件存在于 `assets/design/templates/<template-key>/` 或明确的分支样式目录。
-- `references/design/index.md` 能路由到模板设计文件。
-- `references/template-manifest.json` 中相关 `assets/`、`references/`、`scripts/` 路径存在。
-- 模板选择规则写清默认使用、适用场景和避免场景。
-- 不改写、删除、弱化或移动 `SKILL.md` 中的“重要说明和介绍”。
-- PPTX 输出仍必须通过 `check_pptx_layout.py`，HTML 输出仍必须通过 `check_html_layout.py`。
-
-## 维护提示
-
-- 功能规则优先写入 `references/rule-*.md`，不要把细则堆回 `SKILL.md`。
-- 模板体系变化时，同步更新 README、manifest、模板选择规则和生成日志规则。
-- 发布前运行 `scripts/run_v1_skill_checks.py`，确保 V1 Harness 通过。
+- 功能规则写入 `references/rule-*.md`，机器事实只写入 Skill manifest。
+- Skill 版本、模板包版本、排版算法版本独立维护。
+- 发布前先跑 V1.1 Harness，再执行与改动风险相匹配的真实产物测试。
+- 本地验证通过不等于已提交、推送或发布；这些动作需单独授权。
 
 ## GitHub
 
-- 仓库地址：[vibe-coding-era/gen-tgo-ppt.git](https://github.com/vibe-coding-era/gen-tgo-ppt.git)
+- [vibe-coding-era/gen-tgo-ppt](https://github.com/vibe-coding-era/gen-tgo-ppt)

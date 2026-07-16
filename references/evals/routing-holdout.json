@@ -1,0 +1,138 @@
+{
+  "schema_version": "gen-tgo-ppt-routing-eval-v1.1",
+  "corpus_version": "V1.1",
+  "split": "holdout",
+  "counterpart_corpus": "routing-regression.json",
+  "thresholds": {
+    "precision": 0.9,
+    "recall": 0.9,
+    "mode_accuracy": 0.9,
+    "specificity": 1.0,
+    "handoff_accuracy": 1.0
+  },
+  "cases": [
+    {
+      "case_id": "holdout-create-001",
+      "prompt": "我们没有 Design.md 或 Content.md。请从以下议程草稿开始，设计并生成一份全新的 TGO 鲲鹏会 16:9 演示稿：开场、年度数据、社区故事、明年计划。",
+      "prompt_sha256": "ac3b6a95a5ba12fa185879abd42195a2b1f482a1480bc74c19f0fc6d1063bd2c",
+      "split": "holdout",
+      "case_type": "create",
+      "attachments": [],
+      "expected_route": "invoke",
+      "expected_mode": "create",
+      "expected_handoff": null,
+      "tags": ["positive", "from-scratch", "no-workspace-sources"],
+      "provenance": {
+        "authoring_role": "independent_qa",
+        "sealed": true,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "holdout-convert-001",
+      "prompt": "将附件 PDF《技术领导力报告》改造成 GTLC 会议演示文稿，沿用报告数据并补齐封面、嘉宾介绍和感谢页。",
+      "prompt_sha256": "f8137009fa76ffeeed0c68d698c6d03f1b80772340eff591554982d5cc23d65d",
+      "split": "holdout",
+      "case_type": "convert",
+      "attachments": [
+        {
+          "name": "技术领导力报告.pdf",
+          "media_type": "application/pdf",
+          "role": "conversion_source"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "convert",
+      "expected_handoff": null,
+      "tags": ["positive", "conversion", "pdf"],
+      "provenance": {
+        "authoring_role": "independent_qa",
+        "sealed": true,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "holdout-repair-001",
+      "prompt": "请基于附件 presentation.pptx 做小范围修复：统一页脚、纠正三处文字遮挡，并保持现有主题与页序不变。",
+      "prompt_sha256": "add39f86761eb9f68cd4519956bdb9f6d4140d3d990754b7d6656b13071641bf",
+      "split": "holdout",
+      "case_type": "repair",
+      "attachments": [
+        {
+          "name": "presentation.pptx",
+          "media_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "role": "repair_target"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "repair",
+      "expected_handoff": null,
+      "tags": ["positive", "repair", "minimal-change"],
+      "provenance": {
+        "authoring_role": "independent_qa",
+        "sealed": true,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "holdout-check-only-001",
+      "prompt": "对附件 deck.pptx 做只读审计，核验固定页、密度、对齐和文字错误；不要重写或保存演示文件。",
+      "prompt_sha256": "62305049f9427a4abf5a7be51287ca147e30390dfccacbf187783561b69dc87f",
+      "split": "holdout",
+      "case_type": "check_only",
+      "attachments": [
+        {
+          "name": "deck.pptx",
+          "media_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+          "role": "read_only_target"
+        }
+      ],
+      "expected_route": "invoke",
+      "expected_mode": "check_only",
+      "expected_handoff": null,
+      "tags": ["positive", "check-only", "audit"],
+      "provenance": {
+        "authoring_role": "independent_qa",
+        "sealed": true,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "holdout-no-trigger-001",
+      "prompt": "帮我把以下中文合同条款翻译成英文并标出法律术语，不要制作幻灯片。",
+      "prompt_sha256": "b1687d7a866ebc6abac5fbe3abd48c8930d9fb920751d98b09c2d2b94de1ddc4",
+      "split": "holdout",
+      "case_type": "no_trigger",
+      "attachments": [],
+      "expected_route": "no_trigger",
+      "expected_mode": null,
+      "expected_handoff": null,
+      "tags": ["negative", "translation", "out-of-scope"],
+      "provenance": {
+        "authoring_role": "independent_qa",
+        "sealed": true,
+        "failure_prompt": false
+      }
+    },
+    {
+      "case_id": "holdout-handoff-001",
+      "prompt": "我需要一个支持登录、数据库写入和邮件通知的 SaaS 后台，请完成前后端开发；无需 PPT、HTML 演示稿或汇报材料。",
+      "prompt_sha256": "36affaf5427f393d7c213ee40cdaeb6bbbee9271ccda1026c04286c17a1b98e6",
+      "split": "holdout",
+      "case_type": "handoff",
+      "attachments": [],
+      "expected_route": "handoff",
+      "expected_mode": null,
+      "expected_handoff": {
+        "targets": ["software-development"],
+        "reason_contains": ["登录", "数据库"]
+      },
+      "tags": ["handoff", "saas", "full-stack"],
+      "provenance": {
+        "authoring_role": "independent_qa",
+        "sealed": true,
+        "failure_prompt": false
+      }
+    }
+  ]
+}

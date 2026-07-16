@@ -1,0 +1,189 @@
+{
+  "schema_version": "gen-tgo-ppt-skill-manifest-v1.1",
+  "skill": {
+    "name": "gen-tgo-ppt-skill",
+    "version": "V1.1",
+    "maturity": "beta",
+    "author": "肉山",
+    "entrypoint": "SKILL.md",
+    "source_repository": "https://github.com/vibe-coding-era/gen-tgo-ppt.git"
+  },
+  "version_ownership": {
+    "skill_contract": "V1.1",
+    "template_bundle": "V1",
+    "layout_safety_algorithm": "V1",
+    "rule": "Skill、模板包与排版算法独立演进；不得用 template-manifest.json 的 legacy version 推导 Skill 版本。"
+  },
+  "protected_sections": [
+    {
+      "file": "SKILL.md",
+      "heading": "重要说明和介绍",
+      "mutable": false,
+      "sha256": "e1bbdc853c5d013810730f118850ad46dda9ab3bf59d813a4db890e283757c18"
+    }
+  ],
+  "entrypoints": {
+    "current_harness": "scripts/run_v11_skill_checks.py",
+    "compatibility_harness": "scripts/run_v1_skill_checks.py",
+    "compatibility_direction": "run_v1_skill_checks.py -> run_v11_skill_checks.py",
+    "harness_temp_root": {
+      "cli_option": "--temp-root",
+      "environment_variable": "GEN_TGO_PPT_TEMP_ROOT",
+      "requirement": "existing_writable_directory",
+      "unavailable_status": "INSUFFICIENT",
+      "unavailable_exit_code": 3
+    },
+    "forbidden_calls": [
+      "run_v11_skill_checks.py -> run_v1_skill_checks.py"
+    ]
+  },
+  "runtime": {
+    "python": {
+      "minimum": "3.10",
+      "tested": ["3.13.3"]
+    },
+    "dependency_mapping": {
+      "pptx": "python-pptx",
+      "lxml": "lxml",
+      "PIL": "Pillow"
+    },
+    "optional_distributions": ["python-pptx", "lxml", "Pillow"],
+    "dependency_policy": "--help and structural checks must run without site-packages; dependency-required execution returns E_DEPENDENCY_MISSING without a raw traceback."
+  },
+  "scripts": [
+    {
+      "path": "scripts/check_html_layout.py",
+      "role": "Static HTML slide layout validation",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["read_input", "write_stdout"]
+    },
+    {
+      "path": "scripts/check_pptx_layout.py",
+      "role": "Static PPTX layout validation",
+      "imports": {"third_party": ["pptx"]},
+      "distributions": ["python-pptx"],
+      "side_effects": ["read_input", "write_stdout", "write_stderr_on_expected_error"]
+    },
+    {
+      "path": "scripts/content_budget.py",
+      "role": "Markdown and text density estimation",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["read_input", "write_stdout"]
+    },
+    {
+      "path": "scripts/create_generation_log.py",
+      "role": "Mode-aware V1.1 generation log creation",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["write_current_working_directory_unless_dry_run", "write_stdout"]
+    },
+    {
+      "path": "scripts/evaluate_v11_contract.py",
+      "role": "Routing corpus and observation evaluation",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["read_input", "write_stdout"]
+    },
+    {
+      "path": "scripts/inspect_pptx_style.py",
+      "role": "Read-only PPTX style and media inspection",
+      "imports": {"third_party": ["PIL", "lxml", "pptx"]},
+      "distributions": ["Pillow", "lxml", "python-pptx"],
+      "side_effects": ["read_input", "write_stdout", "write_stderr_on_expected_error"]
+    },
+    {
+      "path": "scripts/run_v1_skill_checks.py",
+      "role": "V1-compatible thin wrapper for the V1.1 harness",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["spawn_current_harness", "forward_optional_temp_root", "preserve_exit_code"]
+    },
+    {
+      "path": "scripts/run_v11_skill_checks.py",
+      "role": "Canonical V1.1 structural, contract, helper and fixture harness",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["read_skill_tree", "probe_configured_temp_root", "run_subprocesses", "use_temporary_directories", "write_stdout"]
+    },
+    {
+      "path": "scripts/scan_task_context.py",
+      "role": "Compact task workspace inventory",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["read_input_tree", "optional_write_output", "write_stdout"]
+    },
+    {
+      "path": "scripts/summarize_layout_report.py",
+      "role": "Compress layout-check JSON",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["read_input", "write_stdout"]
+    }
+  ],
+  "host_requested_capabilities": [
+    {
+      "capability": "presentation_generation_and_rendering",
+      "required_for": ["create", "convert", "major_repair", "observed_output_quality"],
+      "bundled_by_skill": false
+    },
+    {
+      "capability": "real_browser_or_equivalent_html_rendering",
+      "required_for": ["html_visual_validation"],
+      "bundled_by_skill": false
+    },
+    {
+      "capability": "independent_subagents",
+      "required_for": ["formal_or_high_risk_independent_lanes"],
+      "bundled_by_skill": false,
+      "fallback": "separated self-review with explicit non-independent label"
+    }
+  ],
+  "contracts": {
+    "routing": "references/rule-routing-and-modes.md",
+    "workflow": "references/workflow.md",
+    "failure_recovery": "references/rule-failure-recovery.md",
+    "validation": "references/rule-validation.md",
+    "guardrails": "references/rule-guardrails.md",
+    "template_bundle": "references/template-manifest.json"
+  },
+  "evaluations": {
+    "regression_corpus": "references/evals/routing-regression.json",
+    "holdout_corpus": "references/evals/routing-holdout.json",
+    "fixture_observations": {
+      "regression": "references/evals/evaluator-smoke-observations-regression.json",
+      "holdout": "references/evals/evaluator-smoke-observations-holdout.json"
+    },
+    "evaluator": "scripts/evaluate_v11_contract.py",
+    "regression_thresholds": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "mode_accuracy": 1.0,
+      "specificity": 1.0,
+      "handoff_accuracy": 1.0
+    },
+    "holdout_thresholds": {
+      "precision": 0.9,
+      "recall": 0.9,
+      "mode_accuracy": 0.9,
+      "specificity": 1.0,
+      "handoff_accuracy": 1.0
+    },
+    "claim_policy": "Fixture PASS proves evaluator and corpus structure only. Stable behavior claims require at least 20 total cases, at least 3 cases per applicable mode, and at least 3 fresh isolated runs per case."
+  },
+  "error_contract": {
+    "reference": "references/rule-failure-recovery.md",
+    "expected_cli_codes": [
+      "E_DEPENDENCY_MISSING",
+      "E_EVAL_INVALID",
+      "E_EVAL_INSUFFICIENT"
+    ],
+    "raw_traceback_for_expected_failures": false
+  },
+  "outputs": {
+    "primary": ["PPTX", "HTML"],
+    "evidence": ["rendered_pages", "contact_sheet", "generation_log", "layout_report", "SSOT_when_applicable"],
+    "default_overwrite": false
+  }
+}

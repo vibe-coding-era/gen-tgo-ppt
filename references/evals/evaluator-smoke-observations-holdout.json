@@ -1,0 +1,78 @@
+{
+  "schema_version": "gen-tgo-ppt-routing-eval-v1.1",
+  "observations_version": "V1.1-fixture-1",
+  "split": "holdout",
+  "evidence_level": "structural_fixture",
+  "fixture_purpose": "evaluator algorithm smoke only; never Agent behavior evidence",
+  "observations": [
+    {
+      "case_id": "holdout-create-001",
+      "prompt_sha256": "ac3b6a95a5ba12fa185879abd42195a2b1f482a1480bc74c19f0fc6d1063bd2c",
+      "split": "holdout",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-holdout-create-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "create",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "holdout-convert-001",
+      "prompt_sha256": "f8137009fa76ffeeed0c68d698c6d03f1b80772340eff591554982d5cc23d65d",
+      "split": "holdout",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-holdout-convert-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "convert",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "holdout-repair-001",
+      "prompt_sha256": "add39f86761eb9f68cd4519956bdb9f6d4140d3d990754b7d6656b13071641bf",
+      "split": "holdout",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-holdout-repair-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "repair",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "holdout-check-only-001",
+      "prompt_sha256": "62305049f9427a4abf5a7be51287ca147e30390dfccacbf187783561b69dc87f",
+      "split": "holdout",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-holdout-check-only-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "check_only",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "holdout-no-trigger-001",
+      "prompt_sha256": "b1687d7a866ebc6abac5fbe3abd48c8930d9fb920751d98b09c2d2b94de1ddc4",
+      "split": "holdout",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-holdout-no-trigger-001",
+      "status": "ok",
+      "predicted_route": "no_trigger",
+      "predicted_mode": null,
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "holdout-handoff-001",
+      "prompt_sha256": "36affaf5427f393d7c213ee40cdaeb6bbbee9271ccda1026c04286c17a1b98e6",
+      "split": "holdout",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-holdout-handoff-001",
+      "status": "ok",
+      "predicted_route": "handoff",
+      "predicted_mode": null,
+      "predicted_handoff": {
+        "target": "software-development",
+        "reason": "请求包含登录和数据库能力，是完整 SaaS 开发而非演示稿任务。"
+      }
+    }
+  ]
+}

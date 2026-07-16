@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create a gen-tgo-ppt generation log in the current working directory."""
+"""Create or preview a mode-aware gen-tgo-ppt V1.1 generation log."""
 
 from __future__ import annotations
 
@@ -7,12 +7,14 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
-SKILL_VERSION = "V1"
+SKILL_VERSION = "V1.1"
 LAYOUT_SAFETY_VERSION = "V1"
+LOG_MODES = ("create", "convert", "repair", "check_only")
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Create a gen-tgo-ppt generation log.")
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Create or preview a gen-tgo-ppt V1.1 generation log.")
+    parser.add_argument("--mode", choices=LOG_MODES, default="create", help="Task mode; handoff has no generation log.")
     parser.add_argument("--title", default="TGO演示稿生成", help="Task or deck title.")
     parser.add_argument("--source", default="待补充", help="Source file or content description.")
     parser.add_argument("--scenario", default="待确认", help="GTLC or daily sharing.")
@@ -28,20 +30,18 @@ def main() -> None:
         help="For PPT/PDF sources: modify content and apply template, or template-only.",
     )
     parser.add_argument("--logo", default="默认GTLC LOGO", help="Logo replacement decision or uploaded logo path.")
-    args = parser.parse_args()
+    parser.add_argument("--dry-run", action="store_true", help="Print the complete log without writing a file.")
+    return parser
 
-    now = datetime.now().astimezone()
-    filename = f"gen-tgo-ppt-生成日志-{now.strftime('%Y%m%d-%H%M%S')}.md"
-    path = Path.cwd() / filename
-    if path.exists():
-        raise SystemExit(f"Refusing to overwrite existing log: {path}")
 
-    content = f"""# gen-tgo-ppt 生成日志
+def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
+    return f"""# gen-tgo-ppt 生成日志
 
 - Skill 版本：{SKILL_VERSION}
 - 排版安全版本：{LAYOUT_SAFETY_VERSION}
+- 任务模式：{args.mode}
 - 创建时间：{now.isoformat(timespec="seconds")}
-- 当前目录：`{Path.cwd()}`
+- 当前目录：`{cwd}`
 - 任务标题：{args.title}
 - Design.md：{args.design_file}
 - Content.md：{args.content_file}
@@ -53,105 +53,70 @@ def main() -> None:
 - Logo替换：{args.logo}
 - 风格选择：{args.style}
 - 模板选择：{args.template}
-- 生成子智能体：待记录。
-- 校验子智能体：待记录。
-- 生成/校验是否不同子智能体：待记录。
-- 规则子智能体：待记录。
-- SSOT：待记录。
 
-## 设计澄清
+## 澄清与内容边界
 
-- 应用场景：{args.scenario}
-- 规格：{args.spec}
-- 处理模式：{args.processing_mode}
-- Logo替换：{args.logo}
-- 设计输入文件：{args.design_file}
-- PPT固定页：标题页后新增空白 `嘉宾介绍` 页；末尾新增 `感谢聆听` 页。
+- 待记录：用户明确要求、内容是否允许改写、覆盖决定与不可逆边界。
+- 待记录：`check_only` 保持源文件只读；`repair` 记录来源与回滚点。
 
-## 内容探讨
+## 页数、大纲与文本预算
 
-- 内容输入文件：{args.content_file}
-- 主题、问题：待记录。
-- 思考模式：待记录。
-- 待记录：内容总结、是否优化、用户确认。
+- 待记录：逐页标题、目的、布局、核心内容、资产、预计行数、密度风险与拆页策略。
+- 待记录：适用时确认标题页、`嘉宾介绍`、目录、正文与 `感谢聆听` 的顺序。
 
-## 页数与大纲
+## 样片与用户决定
 
-- 待记录：总页数、逐页标题、布局、风格、核心内容，含标题页后的 `嘉宾介绍` 页和最终 `感谢聆听` 页。
-- 待记录：开场页序是否为第 1 页标题页、第 2 页 `嘉宾介绍`、第 3 页目录页、第 4 页起正文；如跳过目录页，记录用户确认或短材料例外。
-- 待记录：标题页和封底是否都使用弱模糊背景 + 居中纯实底内容框；如保留原生标题页，记录用户确认。
-- 待记录：逐页内容预算、标题/正文预计行数、密度风险、是否需要拆页或改布局。
-
-## 样片
-
-- 待记录：样片路径、预览方式、用户反馈。
+- 待记录：样片路径、预览方式、用户反馈；若跳过，记录用户决定和原因。
 
 ## 完整输出
 
-- 待记录：PPTX/HTML 路径、渲染或预览结果。
+- 待记录：PPTX/HTML 路径、来源保留情况、覆盖确认与回滚点。
 
-## 逐页版型校对
+## PPTX/HTML 检查与逐页复核
 
-- 待记录：每一页是否存在样式错乱、无故换行、文本溢出、裁切、Logo/页脚碰撞，并记录修复结果。
+- 待记录：检查命令、PASS/WARN/FAIL、异常页、修复动作、复查和渲染证据。
 
-## V1 排版安全校验
+## 失败、重试与降级
 
-- 待记录：`scripts/check_pptx_layout.py` 命令、结果、FAIL/WARN 页面、修复动作与复查结果。
+- 待记录：稳定错误码、失败分类、改变的条件、重试次数、降级范围与影响。
 
-## HTML 排版安全校验
+## 通道分工与交接
 
-- 待记录：`scripts/check_html_layout.py` 命令、结果、FAIL/WARN 页面、修复动作与复查结果。
+- `生成内容`：待记录 / not_applicable。
+- `检查风格`：待记录 / not_applicable。
+- `检查文字`：待记录 / not_applicable。
+- 执行方式：单 Agent 分离自检 / 独立通道；不得误标独立验证。
 
-## 子智能体分工
+## SSOT（若适用）
 
-- `生成内容`：待记录。
-- `检查风格`：待记录。
-- `检查文字`：待记录。
-- 生成者是否参与校验：不得参与；待复核。
-- 如果未使用独立子智能体，原因：待记录。
-
-## 规则子智能体交接
-
-| 规则文件 | 子智能体 | 结论 | 风险 | 证据 |
-| --- | --- | --- | --- | --- |
-
-## SSOT
-
-### 任务目标
-
-### 用户明确要求
-
-### 已加载规则
-
-### 规则交接摘要
-
-### 冲突与裁决
-
-### 当前唯一执行计划
-
-### 产物路径
-
-### 校验结果
-
-### 遗留问题
-
-## 检查风格
-
-- 待记录：`检查风格` 发现、修复、遗留问题。
-
-## 检查文字
-
-- 待记录：`检查文字` 发现、修复、遗留问题。
+- 待记录：SSOT 路径、冲突与裁决、唯一执行计划；不适用时写明理由。
 
 ## 操作记录
 
 - {now.isoformat(timespec="seconds")} 创建生成日志。
 
-## 待处理问题
+## 遗留问题
 
-- 待核对：日志创建后需补充样片、完整输出、检查结果、SSOT 和遗留问题；完成前不得视为无遗留。
+- 待核对：完成前补齐产物、检查、证据、例外与遗留问题；未填写不得视为“无”。
 """
-    path.write_text(content, encoding="utf-8")
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    now = datetime.now().astimezone()
+    cwd = Path.cwd()
+    content = render_log(args, now, cwd)
+    if args.dry_run:
+        print(content, end="")
+        return
+
+    path = cwd / f"gen-tgo-ppt-生成日志-{now.strftime('%Y%m%d-%H%M%S')}.md"
+    if path.exists():
+        raise SystemExit(f"E_OUTPUT_EXISTS: refusing to overwrite existing log: {path}; action=choose a new timestamp")
+    try:
+        path.write_text(content, encoding="utf-8")
+    except OSError as exc:
+        raise SystemExit(f"E_WORKDIR_READONLY: cannot write generation log in {cwd}: {exc}; action=provide a writable directory") from None
     print(path)
 
 

@@ -1,0 +1,78 @@
+{
+  "schema_version": "gen-tgo-ppt-routing-eval-v1.1",
+  "observations_version": "V1.1-fixture-1",
+  "split": "regression",
+  "evidence_level": "structural_fixture",
+  "fixture_purpose": "evaluator algorithm smoke only; never Agent behavior evidence",
+  "observations": [
+    {
+      "case_id": "regression-create-001",
+      "prompt_sha256": "6631d179362882e2fddc40fc4d8386ef8d150cadb1c960972962311d04521263",
+      "split": "regression",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-regression-create-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "create",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "regression-convert-001",
+      "prompt_sha256": "469472d387e3f5660f72fb80da186c503afed3392626d805bf4a7357258ebade",
+      "split": "regression",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-regression-convert-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "convert",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "regression-repair-001",
+      "prompt_sha256": "2fb5dd73e7be9fd61a60b40f0f1f0ab4c2485eaa0dd86f643d10266f7efa1014",
+      "split": "regression",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-regression-repair-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "repair",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "regression-check-only-001",
+      "prompt_sha256": "8b0ece8ca1f85fb00dd7377f79d6d81436974be1f5df9b34c7048bc365809cff",
+      "split": "regression",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-regression-check-only-001",
+      "status": "ok",
+      "predicted_route": "invoke",
+      "predicted_mode": "check_only",
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "regression-no-trigger-001",
+      "prompt_sha256": "6cc8e31d05234214afa7e5ecc156081d9cc67098203fde0b983e49cff5b2b5c6",
+      "split": "regression",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-regression-no-trigger-001",
+      "status": "ok",
+      "predicted_route": "no_trigger",
+      "predicted_mode": null,
+      "predicted_handoff": null
+    },
+    {
+      "case_id": "regression-handoff-001",
+      "prompt_sha256": "8618340b67e9a5eaba74cb36254f72f041832a8d6c19fdb8863c4efc68f18c7f",
+      "split": "regression",
+      "evidence_level": "structural_fixture",
+      "run_id": "fixture-regression-handoff-001",
+      "status": "ok",
+      "predicted_route": "handoff",
+      "predicted_mode": null,
+      "predicted_handoff": {
+        "target": "sites",
+        "reason": "用户只要交互网站并明确要求部署，不属于 PPT 产物。"
+      }
+    }
+  ]
+}

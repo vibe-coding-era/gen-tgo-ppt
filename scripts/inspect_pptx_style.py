@@ -5,15 +5,43 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import Counter
 from io import BytesIO
 from pathlib import Path
 from zipfile import ZipFile
 
-from lxml import etree
-from PIL import Image
-from pptx import Presentation
-from pptx.enum.shapes import MSO_SHAPE_TYPE
+etree = None
+Image = None
+Presentation = None
+MSO_SHAPE_TYPE = None
+
+
+def load_pptx_style_dependencies() -> list[str]:
+    """Load optional inspection dependencies after CLI parsing."""
+    global etree, Image, Presentation, MSO_SHAPE_TYPE
+    missing: list[str] = []
+    try:
+        from lxml import etree as _etree
+    except ImportError:
+        missing.append("lxml")
+    else:
+        etree = _etree
+    try:
+        from PIL import Image as _Image
+    except ImportError:
+        missing.append("Pillow")
+    else:
+        Image = _Image
+    try:
+        from pptx import Presentation as _Presentation
+        from pptx.enum.shapes import MSO_SHAPE_TYPE as _MSO_SHAPE_TYPE
+    except ImportError:
+        missing.append("python-pptx")
+    else:
+        Presentation = _Presentation
+        MSO_SHAPE_TYPE = _MSO_SHAPE_TYPE
+    return missing
 
 EMU_PER_IN = 914400
 EMU_PER_PT = 12700
@@ -192,6 +220,15 @@ def main():
     parser = argparse.ArgumentParser(description="Inspect PPTX dimensions, layouts, theme, text styles, and media.")
     parser.add_argument("pptx", nargs="+", type=Path)
     args = parser.parse_args()
+    missing = load_pptx_style_dependencies()
+    if missing:
+        distributions = ", ".join(dict.fromkeys(missing))
+        print(
+            f"E_DEPENDENCY_MISSING: required distributions are unavailable: {distributions}; "
+            "install them and retry.",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
     print(json.dumps([inspect(path) for path in args.pptx], ensure_ascii=False, indent=2))
 
 
