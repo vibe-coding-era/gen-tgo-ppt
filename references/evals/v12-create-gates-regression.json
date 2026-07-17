@@ -1,0 +1,60 @@
+{
+  "schema_version": "gen-tgo-ppt-v1.2-create-gates-v1",
+  "corpus_version": "V1.2",
+  "split": "regression",
+  "evidence_level": "structural_fixture",
+  "fixture_purpose": "Static V1.2 create-flow contract cases. They validate required gates and are not model-behavior evidence.",
+  "cases": [
+    {
+      "case_id": "v12-regression-create-clarification-001",
+      "case_type": "create",
+      "prompt": "请做一份关于 Agent 的 PPT。",
+      "missing_brief_fields": ["应用场景和受众", "核心目的", "输出规格", "内容改写边界", "图片资产授权"],
+      "expected_gate": "clarification",
+      "expected_action": "ask_only_missing_fields",
+      "forbidden_actions": ["generate_full_deck", "silently_select_style", "create_final_output"]
+    },
+    {
+      "case_id": "v12-regression-create-brief-002",
+      "case_type": "create",
+      "prompt": "面向 CTO 做 12 页 16:9 PPTX：论证 Agent Harness 应进入平台路线图；可重组内容，允许使用已授权的团队照片。",
+      "missing_brief_fields": [],
+      "expected_gate": "brief_confirmation",
+      "expected_action": "present_parsed_brief_and_wait_for_confirmation",
+      "forbidden_actions": ["generate_full_deck", "silently_select_style", "create_final_output"]
+    },
+    {
+      "case_id": "v12-regression-create-style-003",
+      "case_type": "create",
+      "prompt": "确认上述 Brief；请智能推荐模板和视觉风格。",
+      "missing_brief_fields": [],
+      "brief_confirmation": "confirmed",
+      "expected_gate": "style_confirmation",
+      "expected_action": "show_recommendation_with_reason_and_wait_for_confirmation",
+      "forbidden_actions": ["generate_full_deck", "create_final_output"]
+    },
+    {
+      "case_id": "v12-regression-create-sample-004",
+      "case_type": "create",
+      "prompt": "确认 light 模板与风格 4；核心页可用已授权 AI 工作流图。",
+      "missing_brief_fields": [],
+      "brief_confirmation": "confirmed",
+      "style_confirmation": "confirmed",
+      "expected_gate": "sample_confirmation",
+      "expected_action": "produce_representative_sample_with_preview_evidence",
+      "forbidden_actions": ["generate_full_deck", "create_final_output"]
+    },
+    {
+      "case_id": "v12-regression-create-release-005",
+      "case_type": "create",
+      "prompt": "确认样片；继续生成完整 PPTX。",
+      "missing_brief_fields": [],
+      "brief_confirmation": "confirmed",
+      "style_confirmation": "confirmed",
+      "sample_confirmation": "confirmed",
+      "expected_gate": "full_generation",
+      "expected_action": "generate_full_deck",
+      "forbidden_actions": []
+    }
+  ]
+}

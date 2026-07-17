@@ -1,15 +1,15 @@
 {
-  "schema_version": "gen-tgo-ppt-skill-manifest-v1.1",
+  "schema_version": "gen-tgo-ppt-skill-manifest-v1.2",
   "skill": {
     "name": "gen-tgo-ppt-skill",
-    "version": "V1.1",
+    "version": "V1.2",
     "maturity": "beta",
     "author": "肉山",
     "entrypoint": "SKILL.md",
     "source_repository": "https://github.com/vibe-coding-era/gen-tgo-ppt.git"
   },
   "version_ownership": {
-    "skill_contract": "V1.1",
+    "skill_contract": "V1.2",
     "template_bundle": "V1.1",
     "layout_safety_algorithm": "V1",
     "rule": "Skill、模板包与排版算法独立演进；不得用 template-manifest.json 的 legacy version 推导 Skill 版本。"
@@ -23,7 +23,8 @@
     }
   ],
   "entrypoints": {
-    "current_harness": "scripts/run_v11_skill_checks.py",
+    "current_harness": "scripts/run_v12_skill_checks.py",
+    "core_harness": "scripts/run_v11_skill_checks.py",
     "compatibility_harness": "scripts/run_v1_skill_checks.py",
     "compatibility_direction": "run_v1_skill_checks.py -> run_v11_skill_checks.py",
     "harness_temp_root": {
@@ -34,7 +35,8 @@
       "unavailable_exit_code": 3
     },
     "forbidden_calls": [
-      "run_v11_skill_checks.py -> run_v1_skill_checks.py"
+      "run_v11_skill_checks.py -> run_v1_skill_checks.py",
+      "run_v12_skill_checks.py -> run_v1_skill_checks.py"
     ]
   },
   "runtime": {
@@ -74,7 +76,7 @@
     },
     {
       "path": "scripts/create_generation_log.py",
-      "role": "Mode-aware V1.1 generation log creation",
+      "role": "Mode-aware V1.2 generation log creation",
       "imports": {"third_party": []},
       "distributions": [],
       "side_effects": ["write_current_working_directory_unless_dry_run", "write_stdout"]
@@ -95,17 +97,24 @@
     },
     {
       "path": "scripts/run_v1_skill_checks.py",
-      "role": "V1-compatible thin wrapper for the V1.1 harness",
+      "role": "V1-compatible thin wrapper for the V1.2 core harness",
       "imports": {"third_party": []},
       "distributions": [],
       "side_effects": ["spawn_current_harness", "forward_optional_temp_root", "preserve_exit_code"]
     },
     {
       "path": "scripts/run_v11_skill_checks.py",
-      "role": "Canonical V1.1 structural, contract, helper and fixture harness",
+      "role": "Canonical V1.2 structural, contract, helper and fixture harness (historical filename retained)",
       "imports": {"third_party": []},
       "distributions": [],
       "side_effects": ["read_skill_tree", "probe_configured_temp_root", "run_subprocesses", "use_temporary_directories", "write_stdout"]
+    },
+    {
+      "path": "scripts/run_v12_skill_checks.py",
+      "role": "Current V1.2 thin harness entrypoint",
+      "imports": {"third_party": []},
+      "distributions": [],
+      "side_effects": ["spawn_core_harness", "forward_optional_temp_root", "preserve_exit_code"]
     },
     {
       "path": "scripts/scan_task_context.py",
@@ -143,6 +152,8 @@
   "contracts": {
     "routing": "references/rule-routing-and-modes.md",
     "input_authority": "references/rule-intake.md",
+    "clarification_and_design_gates": "references/rule-clarification-and-design-gates.md",
+    "content_expression": "references/rule-content-expression.md",
     "workflow": "references/workflow.md",
     "failure_recovery": "references/rule-failure-recovery.md",
     "validation": "references/rule-validation.md",
@@ -150,6 +161,8 @@
     "template_bundle": "references/template-manifest.json"
   },
   "evaluations": {
+    "v12_create_gate_corpus": "references/evals/v12-create-gates-regression.json",
+    "v12_create_gate_holdout_corpus": "references/evals/v12-create-gates-holdout.json",
     "regression_corpus": "references/evals/routing-regression.json",
     "holdout_corpus": "references/evals/routing-holdout.json",
     "activation_safety_corpus": "references/evals/activation-safety-regression.json",

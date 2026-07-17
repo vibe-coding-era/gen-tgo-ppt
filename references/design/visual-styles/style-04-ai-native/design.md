@@ -22,3 +22,22 @@ Agents, collaboration, future organization, intelligent networks, autonomous exe
 - Preserve TGO/GTLC dark backgrounds.
 - Add restrained network/glow visuals only when they clarify the idea.
 - Avoid turning the whole deck into a purple-blue gradient theme.
+
+## Content Expression
+
+### Image Treatment
+
+- Use only confirmed user photos, licensed/approved images, or approved AI-generated visuals. Favor interface, team-in-action, or abstract system imagery only when it explains an agent capability or operating change.
+- Treat images with dark blue-purple tones, restrained glow, and generous negative space; use human imagery to show augmented work rather than generic robots.
+
+### Diagram Language
+
+- Use editable agent roles, orchestration paths, feedback loops, and capability layers; encode hierarchy and handoffs with restrained blue-purple connectors.
+
+### Data Expression
+
+- Use capability maturity, automation coverage, quality loops, and before/after throughput charts with a small number of highlighted signals.
+
+### Avoid
+
+- Avoid robot portraits, random particle fields, overloaded network webs, and glow effects that do not clarify workflow or hierarchy.

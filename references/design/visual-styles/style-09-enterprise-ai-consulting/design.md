@@ -44,3 +44,22 @@ Enterprise AI, minimal technology, consulting framework, Apple Keynote, architec
 - Preserve top-right logo, footer, and TGO/GTLC brand chrome.
 - Keep the TGO/GTLC identity layer as the frame, then apply the Enterprise AI Consulting visual language inside the content area.
 - Keep diagrams editable whenever possible.
+
+## Content Expression
+
+### Image Treatment
+
+- Use only confirmed user photos, licensed/approved images, or approved AI-generated visuals. Use product, workplace, or system-context imagery only when it anchors a transformation problem or intended operating outcome.
+- Keep treatment bright, precise, and minimal; use clean crops, white space, and AI blue accents rather than decorative visual effects.
+
+### Diagram Language
+
+- Use editable capability layers, operating-system architecture, workflow containers, decision gates, and before/after comparisons with AI blue systems, green execution, and orange human decisions.
+
+### Data Expression
+
+- Use maturity matrices, value-versus-feasibility charts, adoption funnels, baseline-to-target comparisons, and concise KPI cards; highlight the decision implication.
+
+### Avoid
+
+- Avoid generic robot imagery, glossy marketing scenes, neon gradients, non-editable architecture screenshots, and visual elements that do not clarify the consulting framework.

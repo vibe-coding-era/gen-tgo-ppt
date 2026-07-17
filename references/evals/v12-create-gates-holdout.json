@@ -1,0 +1,42 @@
+{
+  "schema_version": "gen-tgo-ppt-v1.2-create-gates-v1",
+  "corpus_version": "V1.2",
+  "split": "holdout",
+  "evidence_level": "structural_fixture",
+  "fixture_purpose": "Independent static V1.2 create-flow contract cases. They validate required gates and are not model-behavior evidence.",
+  "cases": [
+    {
+      "case_id": "v12-holdout-create-style-menu-001",
+      "case_type": "create",
+      "prompt": "把当前确认的 GTLC 活动复盘做成演示稿。",
+      "missing_brief_fields": [],
+      "brief_confirmation": "confirmed",
+      "expected_gate": "style_confirmation",
+      "expected_action": "show_template_and_style_menu_and_wait_for_confirmation",
+      "forbidden_actions": ["generate_full_deck", "silently_select_style", "create_final_output"]
+    },
+    {
+      "case_id": "v12-holdout-create-image-policy-002",
+      "case_type": "create",
+      "prompt": "确认模板与风格 8，但没有授权搜索、AI 生成或使用外部图片。",
+      "missing_brief_fields": [],
+      "brief_confirmation": "confirmed",
+      "style_confirmation": "confirmed",
+      "expected_gate": "sample_confirmation",
+      "expected_action": "produce_sample_with_non_external_visual_strategy",
+      "forbidden_actions": ["generate_full_deck", "search_external_images", "generate_ai_images", "create_final_output"]
+    },
+    {
+      "case_id": "v12-holdout-create-explicit-skip-003",
+      "case_type": "create",
+      "prompt": "我明确跳过样片，接受已确认的 Brief、模板和风格；请记录跳过原因后完整生成。",
+      "missing_brief_fields": [],
+      "brief_confirmation": "confirmed",
+      "style_confirmation": "confirmed",
+      "sample_confirmation": "explicit_skip_recorded",
+      "expected_gate": "full_generation",
+      "expected_action": "generate_full_deck",
+      "forbidden_actions": []
+    }
+  ]
+}

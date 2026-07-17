@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create or preview a mode-aware gen-tgo-ppt V1.1 generation log."""
+"""Create or preview a mode-aware gen-tgo-ppt V1.2 generation log."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import argparse
 from datetime import datetime
 from pathlib import Path
 
-SKILL_VERSION = "V1.1"
+SKILL_VERSION = "V1.2"
 LAYOUT_SAFETY_VERSION = "V1"
 TEMPLATE_BUNDLE_VERSION = "V1.1"
 LOG_MODES = ("create", "convert", "repair", "check_only")
@@ -23,7 +23,7 @@ SOURCE_REQUIRED_MODES = {"create", "convert", "repair"}
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Create or preview a gen-tgo-ppt V1.1 generation log.")
+    parser = argparse.ArgumentParser(description="Create or preview a gen-tgo-ppt V1.2 generation log.")
     parser.add_argument("--mode", choices=LOG_MODES, default="create", help="Task mode; handoff has no generation log.")
     parser.add_argument("--title", default="TGO演示稿生成", help="Task or deck title.")
     parser.add_argument("--source", default="待补充", help="Source file or content description.")
@@ -41,6 +41,36 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--format", default="待确认", help="PPT, HTML, or both.")
     parser.add_argument("--style", default="待确认", help="Selected visual style numbers.")
     parser.add_argument("--template", default="待确认", help="Template choice.")
+    parser.add_argument(
+        "--clarification-status",
+        default="待确认",
+        help="Whether missing create inputs were clarified with the user.",
+    )
+    parser.add_argument(
+        "--brief-confirmation",
+        default="待确认",
+        help="User decision on the parsed content brief.",
+    )
+    parser.add_argument(
+        "--style-confirmation",
+        default="待确认",
+        help="User decision on the displayed template and visual style selection.",
+    )
+    parser.add_argument(
+        "--sample-confirmation",
+        default="待确认",
+        help="User decision on the representative sample slide, or an explicit skip decision.",
+    )
+    parser.add_argument(
+        "--asset-source-strategy",
+        default="待确认",
+        help="Allowed asset sources, such as user assets, confirmed local licensed assets, or approved AI visuals.",
+    )
+    parser.add_argument(
+        "--page-expression-plan",
+        default="待记录",
+        help="Page-level expression type, visual carrier, asset source, and style constraint record path or summary.",
+    )
     parser.add_argument("--design-file", default="Design.md", help="Design intake file path.")
     parser.add_argument("--content-file", default="Content.md", help="Content draft file path.")
     parser.add_argument(
@@ -74,6 +104,19 @@ def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
 - Logo替换：{args.logo}
 - 风格选择：{args.style}
 - 模板选择：{args.template}
+- 澄清状态：{args.clarification_status}
+- Brief 确认：{args.brief_confirmation}
+- 风格确认：{args.style_confirmation}
+- 样片确认：{args.sample_confirmation}
+- 资产来源策略：{args.asset_source_strategy}
+- 页级视觉表达：{args.page_expression_plan}
+
+## V1.2 必经确认门
+
+- 待记录：缺失字段的澄清问题、用户回答与“无需澄清”的依据；未完成澄清不得进入完整生成。
+- 待记录：解析后的 Brief、用户确认或修改；未确认不得进入风格或样片后的完整生成。
+- 待记录：已展示的模板/风格预览、用户选择或“智能推荐”的确认；不得静默套用默认风格。
+- 待记录：代表性样片、预览证据与用户确认；跳过仅限用户明确决定并记录原因。
 
 ## 澄清与内容边界
 
@@ -84,6 +127,7 @@ def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
 ## 页数、大纲与文本预算
 
 - 待记录：逐页标题、目的、布局、核心内容、资产、预计行数、密度风险与拆页策略。
+- 待记录：每个核心内容页的表达类型、视觉载体、资产来源和所选风格约束；图片、图表与图解须服务于观点，不得仅作装饰。
 - 待记录：适用时确认标题页、`嘉宾介绍`、目录、正文与 `感谢聆听` 的顺序。
 
 ## 样片与用户决定

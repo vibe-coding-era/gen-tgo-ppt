@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the gen-tgo-ppt-skill V1.1 maintenance harness."""
+"""Run the gen-tgo-ppt-skill V1.2 core maintenance harness (legacy filename)."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ from zipfile import ZipFile
 from collections import Counter
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, Callable, Iterator
+from typing import Any, Callable, Dict, Iterator, List, Optional, Set, Tuple, Union
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,10 +26,10 @@ SCRIPTS = ROOT / "scripts"
 COMPATIBILITY_WRAPPER = SCRIPTS / "run_v1_skill_checks.py"
 SKILL_MANIFEST_PATH = ROOT / "references" / "skill-manifest.json"
 TEMPLATE_MANIFEST_PATH = ROOT / "references" / "template-manifest.json"
-EXPECTED_SKILL_VERSION = "V1.1"
+EXPECTED_SKILL_VERSION = "V1.2"
 EXPECTED_TEMPLATE_VERSION = "V1.1"
 EXPECTED_LAYOUT_VERSION = "V1"
-EXPECTED_SCHEMA = "gen-tgo-ppt-skill-manifest-v1.1"
+EXPECTED_SCHEMA = "gen-tgo-ppt-skill-manifest-v1.2"
 EVAL_SCHEMA = "gen-tgo-ppt-routing-eval-v1.1"
 ACTIVATION_SAFETY_SCHEMA = "gen-tgo-ppt-activation-safety-v1.1"
 PROTECTED_SHA256 = "e1bbdc853c5d013810730f118850ad46dda9ab3bf59d813a4db890e283757c18"
@@ -38,7 +38,8 @@ TEXT_EXTENSIONS = {".json", ".md", ".py", ".txt", ".yaml", ".yml"}
 CASE_TYPES = {"create", "convert", "repair", "check_only", "no_trigger", "handoff"}
 IMPORT_TO_DISTRIBUTION = {"pptx": "python-pptx", "lxml": "lxml", "PIL": "Pillow"}
 TEMP_ROOT_ENV = "GEN_TGO_PPT_TEMP_ROOT"
-TEMP_ROOT: Path | None = None
+MINIMUM_PYTHON_VERSION = (3, 10)
+TEMP_ROOT: Optional[Path] = None
 TEMP_REQUIRED_CHECKS = {
     "generation_log_dry_run_and_actual",
     "html_fixtures",
@@ -48,7 +49,7 @@ TEMP_REQUIRED_CHECKS = {
 }
 
 
-def resolve_temp_root(explicit: Path | None) -> tuple[Path | None, dict[str, Any]]:
+def resolve_temp_root(explicit: Optional[Path]) -> Tuple[Optional[Path], Dict[str, Any]]:
     source = "--temp-root" if explicit is not None else TEMP_ROOT_ENV if os.environ.get(TEMP_ROOT_ENV) else "system"
     candidate = explicit
     if candidate is None and os.environ.get(TEMP_ROOT_ENV):
@@ -99,10 +100,10 @@ def temporary_directory() -> Iterator[str]:
 
 
 def run(
-    command: list[str],
+    command: List[str],
     *,
-    cwd: Path | None = None,
-    expected: int | set[int] | None = 0,
+    cwd: Optional[Path] = None,
+    expected: Optional[Union[int, Set[int]]] = 0,
 ) -> subprocess.CompletedProcess[str]:
     env = os.environ.copy()
     env["PYTHONDONTWRITEBYTECODE"] = "1"
@@ -214,7 +215,7 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
     if not isinstance(skill, dict) or skill.get("name") != "gen-tgo-ppt-skill":
         raise AssertionError("Skill manifest identity mismatch")
     if skill.get("version") != EXPECTED_SKILL_VERSION:
-        raise AssertionError("Skill manifest version must be V1.1")
+        raise AssertionError("Skill manifest version must be V1.2")
     ownership = skill_manifest.get("version_ownership")
     expected_ownership = {
         "skill_contract": EXPECTED_SKILL_VERSION,
@@ -233,14 +234,20 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
     if not isinstance(entrypoints, dict):
         raise AssertionError("Skill manifest entrypoints must be an object")
     expected_entrypoints = {
-        "current_harness": "scripts/run_v11_skill_checks.py",
+        "current_harness": "scripts/run_v12_skill_checks.py",
+        "core_harness": "scripts/run_v11_skill_checks.py",
         "compatibility_harness": "scripts/run_v1_skill_checks.py",
         "compatibility_direction": "run_v1_skill_checks.py -> run_v11_skill_checks.py",
     }
     if any(entrypoints.get(key) != value for key, value in expected_entrypoints.items()):
         raise AssertionError("Harness entrypoint direction is inconsistent")
-    if "run_v11_skill_checks.py -> run_v1_skill_checks.py" not in entrypoints.get("forbidden_calls", []):
-        raise AssertionError("Skill manifest must forbid V1.1 -> V1 harness callbacks")
+    forbidden_calls = set(entrypoints.get("forbidden_calls", []))
+    required_forbidden_calls = {
+        "run_v11_skill_checks.py -> run_v1_skill_checks.py",
+        "run_v12_skill_checks.py -> run_v1_skill_checks.py",
+    }
+    if not required_forbidden_calls.issubset(forbidden_calls):
+        raise AssertionError("Skill manifest must forbid V1.2 harness callbacks to the V1 wrapper")
 
     if template_manifest.get("manifest_type") != "template_bundle":
         raise AssertionError("template-manifest.json manifest_type must be template_bundle")
@@ -255,22 +262,22 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     agents_text = (ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8")
     log_source = (SCRIPTS / "create_generation_log.py").read_text(encoding="utf-8")
-    if "当前版本：V1.1" not in skill_text or "模板包版本：V1.1" not in skill_text:
+    if "当前版本：V1.2" not in skill_text or "模板包版本：V1.1" not in skill_text:
         raise AssertionError("SKILL.md version declarations are inconsistent")
-    if "Skill 版本：V1.1" not in readme_text or "run_v11_skill_checks.py" not in readme_text:
-        raise AssertionError("README.md must identify V1.1 and the canonical harness")
+    if "Skill 版本：V1.2" not in readme_text or "run_v12_skill_checks.py" not in readme_text:
+        raise AssertionError("README.md must identify V1.2 and the canonical harness")
     if (
-        "V1.1" not in agents_text
+        "V1.2" not in agents_text
         or "allow_implicit_invocation: true" not in agents_text
         or "E_ROUTE_AMBIGUOUS" not in agents_text
     ):
-        raise AssertionError("agents/openai.yaml V1.1 routing metadata is incomplete")
+        raise AssertionError("agents/openai.yaml V1.2 routing metadata is incomplete")
     if (
-        'SKILL_VERSION = "V1.1"' not in log_source
+        'SKILL_VERSION = "V1.2"' not in log_source
         or 'LAYOUT_SAFETY_VERSION = "V1"' not in log_source
         or 'TEMPLATE_BUNDLE_VERSION = "V1.1"' not in log_source
     ):
-        raise AssertionError("Generation-log version constants are inconsistent")
+        raise AssertionError("Generation-log V1.2/V1.1/V1 version constants are inconsistent")
 
     manifest_script_paths = {
         item.get("path") for item in skill_manifest.get("scripts", []) if isinstance(item, dict)
@@ -299,6 +306,8 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
         raise AssertionError("Skill manifest must declare the input-authority contract")
     if evaluations.get("activation_safety_corpus") != "references/evals/activation-safety-regression.json":
         raise AssertionError("Skill manifest must declare the activation-safety corpus")
+    if evaluations.get("v12_create_gate_corpus") != "references/evals/v12-create-gates-regression.json":
+        raise AssertionError("Skill manifest must declare the V1.2 create-gate corpus")
     if "E_INPUT_UNCONFIRMED" not in error_codes:
         raise AssertionError("Skill manifest must declare E_INPUT_UNCONFIRMED")
     return {
@@ -523,7 +532,7 @@ def check_wrapper_contract(tree: ast.AST, source: str) -> None:
             if node.func.attr == "run" and isinstance(node.func.value, ast.Name) and node.func.value.id == "subprocess":
                 spawn_lines.append(node.lineno)
     if not parse_lines or not spawn_lines or min(parse_lines) >= min(spawn_lines):
-        raise AssertionError("V1 wrapper must parse --help before spawning the V1.1 harness")
+        raise AssertionError("V1 wrapper must parse --help before spawning the V1.2 core harness")
     if not any(
         isinstance(node, ast.Return)
         and isinstance(node.value, ast.Attribute)
@@ -603,7 +612,21 @@ def check_generation_log_dry_run_and_actual() -> dict[str, Any]:
         )
         if list(cwd.iterdir()):
             raise AssertionError("Generation-log --dry-run wrote files")
-        for required in ("Skill 版本：V1.1", "排版安全版本：V1", "模板包版本：V1.1", "任务模式：create", "输入归属：current_turn", "## 失败、重试与降级"):
+        for required in (
+            "Skill 版本：V1.2",
+            "排版安全版本：V1",
+            "模板包版本：V1.1",
+            "任务模式：create",
+            "输入归属：current_turn",
+            "## V1.2 必经确认门",
+            "澄清状态：待确认",
+            "Brief 确认：待确认",
+            "风格确认：待确认",
+            "样片确认：待确认",
+            "资产来源策略：待确认",
+            "页级视觉表达：待记录",
+            "## 失败、重试与降级",
+        ):
             if required not in dry.stdout:
                 raise AssertionError(f"Generation-log dry-run is missing {required!r}")
 
@@ -630,7 +653,15 @@ def check_generation_log_dry_run_and_actual() -> dict[str, Any]:
         if len(files) != 1 or files[0].resolve() != output_path.resolve():
             raise AssertionError("Generation-log actual mode must create exactly one log")
         text = output_path.read_text(encoding="utf-8")
-        for required in ("Skill 版本：V1.1", "排版安全版本：V1", "模板包版本：V1.1", "任务模式：convert", "输入归属：explicit_path", "## 遗留问题"):
+        for required in (
+            "Skill 版本：V1.2",
+            "排版安全版本：V1",
+            "模板包版本：V1.1",
+            "任务模式：convert",
+            "输入归属：explicit_path",
+            "## V1.2 必经确认门",
+            "## 遗留问题",
+        ):
             if required not in text:
                 raise AssertionError(f"Generated log is missing {required!r}")
     return {"unconfirmed_rejected": 1, "dry_run_writes": 0, "actual_logs_created": 1}
@@ -994,7 +1025,13 @@ def check_packaging() -> dict[str, Any]:
     if broken_links:
         raise AssertionError(f"Broken symlinks must not be packaged: {broken_links}")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    required = ["如何增加新模板", "references/skill-manifest.json", "run_v11_skill_checks.py", "run_v1_skill_checks.py"]
+    required = [
+        "如何增加新模板",
+        "references/skill-manifest.json",
+        "run_v12_skill_checks.py",
+        "run_v11_skill_checks.py",
+        "run_v1_skill_checks.py",
+    ]
     missing = [item for item in required if item not in readme]
     if missing:
         raise AssertionError(f"README.md packaging/maintenance instructions are incomplete: {missing}")
@@ -1020,7 +1057,7 @@ CHECKS: list[tuple[str, str, Callable[[], dict[str, Any]]]] = [
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Run V1.1 structural, deterministic CLI, helper, and evaluator-fixture checks."
+        description="Run V1.2 core structural, deterministic CLI, helper, and evaluator-fixture checks."
     )
     parser.add_argument("--compact", action="store_true", help="Emit compact JSON instead of indented JSON.")
     parser.add_argument(
@@ -1035,7 +1072,20 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: Optional[List[str]] = None) -> int:
+    if sys.version_info < MINIMUM_PYTHON_VERSION:
+        payload = {
+            "status": "INSUFFICIENT",
+            "entrypoint": os.environ.get(ENTRYPOINT_ENV, Path(__file__).name),
+            "harness_version": EXPECTED_SKILL_VERSION,
+            "error_code": "E_PYTHON_VERSION",
+            "error": (
+                "gen-tgo-ppt V1.2 Harness requires Python >=3.10; "
+                f"current={sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+            ),
+        }
+        print(json.dumps(payload, ensure_ascii=False, sort_keys=True))
+        return 3
     global TEMP_ROOT
     args = build_parser().parse_args(argv)
     TEMP_ROOT, temp_workspace = resolve_temp_root(args.temp_root)
@@ -1080,7 +1130,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         status = "PASS"
     entrypoint = os.environ.get(ENTRYPOINT_ENV, Path(__file__).name)
-    if entrypoint not in {"run_v11_skill_checks.py", "run_v1_skill_checks.py"}:
+    if entrypoint not in {"run_v11_skill_checks.py", "run_v12_skill_checks.py", "run_v1_skill_checks.py"}:
         entrypoint = Path(__file__).name
     payload = {
         "status": status,
