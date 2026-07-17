@@ -10,7 +10,7 @@
   },
   "version_ownership": {
     "skill_contract": "V1.1",
-    "template_bundle": "V1",
+    "template_bundle": "V1.1",
     "layout_safety_algorithm": "V1",
     "rule": "Skill、模板包与排版算法独立演进；不得用 template-manifest.json 的 legacy version 推导 Skill 版本。"
   },
@@ -142,6 +142,7 @@
   ],
   "contracts": {
     "routing": "references/rule-routing-and-modes.md",
+    "input_authority": "references/rule-intake.md",
     "workflow": "references/workflow.md",
     "failure_recovery": "references/rule-failure-recovery.md",
     "validation": "references/rule-validation.md",
@@ -151,6 +152,7 @@
   "evaluations": {
     "regression_corpus": "references/evals/routing-regression.json",
     "holdout_corpus": "references/evals/routing-holdout.json",
+    "activation_safety_corpus": "references/evals/activation-safety-regression.json",
     "fixture_observations": {
       "regression": "references/evals/evaluator-smoke-observations-regression.json",
       "holdout": "references/evals/evaluator-smoke-observations-holdout.json"
@@ -176,6 +178,7 @@
     "reference": "references/rule-failure-recovery.md",
     "expected_cli_codes": [
       "E_DEPENDENCY_MISSING",
+      "E_INPUT_UNCONFIRMED",
       "E_EVAL_INVALID",
       "E_EVAL_INSUFFICIENT"
     ],

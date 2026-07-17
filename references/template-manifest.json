@@ -3,8 +3,8 @@
   "author": "肉山",
   "manifest_type": "template_bundle",
   "version": "V1",
-  "version_semantics": "legacy alias for template_bundle_version; not the Skill contract version",
-  "template_bundle_version": "V1",
+  "version_semantics": "legacy major-version field retained at V1; template_bundle_version is the current template package version and is independent from the Skill contract version",
+  "template_bundle_version": "V1.1",
   "skill_manifest": "references/skill-manifest.json",
   "protected_notice": {
     "mutable_by_ai": false,
@@ -15,6 +15,7 @@
   "menus": {
     "scenario": ["用于 GTLC", "用于日常分享"],
     "format": ["PPT", "HTML"],
+    "template": ["light", "white", "dark", "loop-orange-white", "tgo-daily"],
     "style_preview": "assets/design/previews/styles/tgo-presentation-design-system-v1.png",
     "style_reference": "references/design/index.md",
     "numeric_confirmation": true
@@ -70,7 +71,7 @@
     "contact_sheet": "assets/design/previews/templates/template-contact-sheet.png",
     "tgo-daily": "assets/design/previews/templates/tgo-daily-template-contact-sheet.png",
     "loop-orange-white-selector": "assets/design/branches/loop-orange-white/tgo-gtlc-style-branches-contact-sheet.png",
-    "loop-orange-white-complete": "assets/design/branches/loop-orange-white/loop-2026-template-complete-contact-sheet.png"
+    "loop-orange-white-complete": "assets/design/templates/loop-orange-white/tgo-loop-summit-16x9-contact-sheet.png"
   },
   "template_defaults": {
     "GTLC 大会": "light",
@@ -79,11 +80,13 @@
   "branch_styles": {
     "D": {
       "id": "GTLC-LOOP-OrangeWhite",
-      "name": "LOOP Summit 橙白峰会风",
+      "name": "LOOP 大会",
       "template_key": "loop-orange-white",
-      "role": "GTLC branch style for AI ecosystem summits, sponsor benefits, city chapter events, and event-facing decks",
+      "aliases": ["LOOP Summit", "LOOP Orange White", "LOOP 橙白峰会风", "D"],
+      "role": "Directly selectable GTLC/LOOP conference template for AI ecosystem summits, sponsor benefits, city chapter events, and event-facing decks",
+      "asset": "assets/design/templates/loop-orange-white/tgo-loop-summit-16x9.pptx",
       "selector_pdf": "assets/design/branches/loop-orange-white/tgo-gtlc-style-branches.pdf",
-      "complete_preview_pdf": "assets/design/branches/loop-orange-white/loop-2026-template-complete.pdf",
+      "complete_preview_pdf": "assets/design/templates/loop-orange-white/tgo-loop-summit-16x9-preview.pdf",
       "default_for_gtlc": false
     }
   },
@@ -326,6 +329,31 @@
         "default_content_body": {"x": 1.473, "y": 4.2, "w": 20.648, "h": 7.849},
         "slide_number": {"x": 13.152, "y": 11.328, "w": 0.354, "h": 0.361}
       }
+    },
+    "loop-orange-white": {
+      "asset": "assets/design/templates/loop-orange-white/tgo-loop-summit-16x9.pptx",
+      "source": "TGO_LOOP_16x9_Brand_Template.pptx",
+      "asset_sha256": "8d1ef5e3b388c5e660ce4cd86e3c14b742d488a7b1806ce11edc25da6d00db11",
+      "design": "references/design/templates/loop-orange-white/design.md",
+      "display_name": "LOOP 大会",
+      "aliases": ["LOOP Summit", "LOOP Orange White", "LOOP 橙白峰会风", "D"],
+      "role": "AI ecosystem conference, keynote, sponsor, and event-facing presentation",
+      "direct_select": true,
+      "default_for_scene": null,
+      "slides": 7,
+      "masters": 1,
+      "canvas": {"width_in": 13.333, "height_in": 7.5, "ratio": "16:9"},
+      "layouts": ["Title Slide"],
+      "slide_archetypes": [
+        "cover",
+        "keynote_topic_or_guest_intro_base",
+        "agenda",
+        "section_divider",
+        "dark_content",
+        "light_content",
+        "closing"
+      ],
+      "preview": "assets/design/templates/loop-orange-white/tgo-loop-summit-16x9-contact-sheet.png"
     }
   },
   "colors": {

@@ -1,0 +1,56 @@
+{
+  "schema_version": "gen-tgo-ppt-activation-safety-v1.1",
+  "purpose": "Regression cases for activation-only prompts and workspace-source authorization. These fixtures define contracts but are not model-behavior evidence.",
+  "cases": [
+    {
+      "case_id": "activation-only-run-skill-001",
+      "prompt": "运行此 SKILL",
+      "prompt_sha256": "b4538cd35d1236d4bb288a7496fe83924f3e61411cb00d7affe1abaa16324021",
+      "workspace_candidates": ["Design.md", "Content.md"],
+      "expected_mode": null,
+      "expected_error": "E_ROUTE_AMBIGUOUS",
+      "expected_action": "ask_one_mode_question",
+      "forbidden_actions": ["scan_workspace", "read_workspace_content", "create_log", "generate_output"]
+    },
+    {
+      "case_id": "activation-only-name-skill-002",
+      "prompt": "使用 $gen-tgo-ppt-skill",
+      "prompt_sha256": "5c7a2740946b7a4d89afcb7a0192f02383c01c22e773d14119aee23945b0cec8",
+      "workspace_candidates": ["Design.md", "Content.md", "old-output.pptx"],
+      "expected_mode": null,
+      "expected_error": "E_ROUTE_AMBIGUOUS",
+      "expected_action": "ask_one_mode_question",
+      "forbidden_actions": ["scan_workspace", "read_workspace_content", "create_log", "generate_output"]
+    },
+    {
+      "case_id": "create-with-unconfirmed-workspace-003",
+      "prompt": "请生成一份 GTLC 风格 PPTX。",
+      "prompt_sha256": "fd2c7ea2eb05a277cdf0f5e513ac3c837a8ed96e9e95adc2cadfd966e360b623",
+      "workspace_candidates": ["Design.md", "Content.md"],
+      "expected_mode": "create",
+      "expected_error": "E_INPUT_UNCONFIRMED",
+      "expected_action": "ask_one_source_question",
+      "forbidden_actions": ["read_workspace_content", "create_log", "generate_output"]
+    },
+    {
+      "case_id": "create-with-explicit-workspace-files-004",
+      "prompt": "请根据本目录的 Design.md 和 Content.md 生成一份 GTLC 风格 PPTX。",
+      "prompt_sha256": "b50cf831c4f1c9f87bda4a3988593df9f3e7701cdc3b4baeee70ab596253eee5",
+      "workspace_candidates": ["Design.md", "Content.md"],
+      "expected_mode": "create",
+      "expected_error": null,
+      "expected_source_authority": "explicit_path",
+      "expected_action": "continue_intake"
+    },
+    {
+      "case_id": "create-with-current-turn-content-005",
+      "prompt": "请把下面内容生成 GTLC 风格 PPTX：主题是工程化 Agent Harness。",
+      "prompt_sha256": "d3ee031fb6eb907ad92226fa3771495f16709b7d18afc7afb5df7e5531161013",
+      "workspace_candidates": [],
+      "expected_mode": "create",
+      "expected_error": null,
+      "expected_source_authority": "current_turn",
+      "expected_action": "continue_intake"
+    }
+  ]
+}

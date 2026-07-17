@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from zipfile import ZipFile
 from collections import Counter
 from contextlib import contextmanager
 from pathlib import Path
@@ -26,9 +27,11 @@ COMPATIBILITY_WRAPPER = SCRIPTS / "run_v1_skill_checks.py"
 SKILL_MANIFEST_PATH = ROOT / "references" / "skill-manifest.json"
 TEMPLATE_MANIFEST_PATH = ROOT / "references" / "template-manifest.json"
 EXPECTED_SKILL_VERSION = "V1.1"
-EXPECTED_TEMPLATE_VERSION = "V1"
+EXPECTED_TEMPLATE_VERSION = "V1.1"
+EXPECTED_LAYOUT_VERSION = "V1"
 EXPECTED_SCHEMA = "gen-tgo-ppt-skill-manifest-v1.1"
 EVAL_SCHEMA = "gen-tgo-ppt-routing-eval-v1.1"
+ACTIVATION_SAFETY_SCHEMA = "gen-tgo-ppt-activation-safety-v1.1"
 PROTECTED_SHA256 = "e1bbdc853c5d013810730f118850ad46dda9ab3bf59d813a4db890e283757c18"
 ENTRYPOINT_ENV = "GEN_TGO_PPT_HARNESS_ENTRYPOINT"
 TEXT_EXTENSIONS = {".json", ".md", ".py", ".txt", ".yaml", ".yml"}
@@ -216,7 +219,7 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
     expected_ownership = {
         "skill_contract": EXPECTED_SKILL_VERSION,
         "template_bundle": EXPECTED_TEMPLATE_VERSION,
-        "layout_safety_algorithm": EXPECTED_TEMPLATE_VERSION,
+        "layout_safety_algorithm": EXPECTED_LAYOUT_VERSION,
     }
     if not isinstance(ownership, dict) or any(ownership.get(k) != v for k, v in expected_ownership.items()):
         raise AssertionError("Skill/template/layout version ownership is inconsistent")
@@ -241,10 +244,10 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
 
     if template_manifest.get("manifest_type") != "template_bundle":
         raise AssertionError("template-manifest.json manifest_type must be template_bundle")
-    if template_manifest.get("version") != EXPECTED_TEMPLATE_VERSION:
+    if template_manifest.get("version") != "V1":
         raise AssertionError("template-manifest.json legacy version must remain V1")
     if template_manifest.get("template_bundle_version") != EXPECTED_TEMPLATE_VERSION:
-        raise AssertionError("template bundle version must remain V1")
+        raise AssertionError("template bundle version must be V1.1")
     if template_manifest.get("skill_manifest") != "references/skill-manifest.json":
         raise AssertionError("Template manifest must link to the Skill manifest")
 
@@ -252,13 +255,21 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
     readme_text = (ROOT / "README.md").read_text(encoding="utf-8")
     agents_text = (ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8")
     log_source = (SCRIPTS / "create_generation_log.py").read_text(encoding="utf-8")
-    if "当前版本：V1.1" not in skill_text or "模板包版本：V1" not in skill_text:
+    if "当前版本：V1.1" not in skill_text or "模板包版本：V1.1" not in skill_text:
         raise AssertionError("SKILL.md version declarations are inconsistent")
     if "Skill 版本：V1.1" not in readme_text or "run_v11_skill_checks.py" not in readme_text:
         raise AssertionError("README.md must identify V1.1 and the canonical harness")
-    if "V1.1" not in agents_text or "allow_implicit_invocation: true" not in agents_text:
+    if (
+        "V1.1" not in agents_text
+        or "allow_implicit_invocation: true" not in agents_text
+        or "E_ROUTE_AMBIGUOUS" not in agents_text
+    ):
         raise AssertionError("agents/openai.yaml V1.1 routing metadata is incomplete")
-    if 'SKILL_VERSION = "V1.1"' not in log_source or 'LAYOUT_SAFETY_VERSION = "V1"' not in log_source:
+    if (
+        'SKILL_VERSION = "V1.1"' not in log_source
+        or 'LAYOUT_SAFETY_VERSION = "V1"' not in log_source
+        or 'TEMPLATE_BUNDLE_VERSION = "V1.1"' not in log_source
+    ):
         raise AssertionError("Generation-log version constants are inconsistent")
 
     manifest_script_paths = {
@@ -280,6 +291,16 @@ def check_version_manifests_agents_and_paths() -> dict[str, Any]:
     }
     assert_paths_exist(manifest_paths, "Manifests")
     assert_paths_exist(referenced_paths, "SKILL.md")
+
+    contracts = skill_manifest.get("contracts", {})
+    evaluations = skill_manifest.get("evaluations", {})
+    error_codes = skill_manifest.get("error_contract", {}).get("expected_cli_codes", [])
+    if contracts.get("input_authority") != "references/rule-intake.md":
+        raise AssertionError("Skill manifest must declare the input-authority contract")
+    if evaluations.get("activation_safety_corpus") != "references/evals/activation-safety-regression.json":
+        raise AssertionError("Skill manifest must declare the activation-safety corpus")
+    if "E_INPUT_UNCONFIRMED" not in error_codes:
+        raise AssertionError("Skill manifest must declare E_INPUT_UNCONFIRMED")
     return {
         "skill_version": EXPECTED_SKILL_VERSION,
         "template_bundle_version": EXPECTED_TEMPLATE_VERSION,
@@ -310,6 +331,128 @@ def check_no_stale_contracts() -> dict[str, Any]:
             if needle in text:
                 raise AssertionError(f"{reason}: {path.relative_to(ROOT)}")
     return {"text_files_checked": checked}
+
+
+def check_activation_and_input_authority_contracts() -> dict[str, Any]:
+    safety_path = ROOT / "references" / "evals" / "activation-safety-regression.json"
+    safety = load_json(safety_path)
+    if safety.get("schema_version") != ACTIVATION_SAFETY_SCHEMA:
+        raise AssertionError("Activation-safety corpus schema mismatch")
+    cases = safety.get("cases")
+    if not isinstance(cases, list) or len(cases) != 5:
+        raise AssertionError("Activation-safety corpus must contain exactly five cases")
+
+    case_ids: set[str] = set()
+    prompt_hashes: set[str] = set()
+    for case in cases:
+        if not isinstance(case, dict):
+            raise AssertionError("Activation-safety cases must be objects")
+        case_id = case.get("case_id")
+        prompt = case.get("prompt")
+        digest = case.get("prompt_sha256")
+        if not isinstance(case_id, str) or not isinstance(prompt, str) or not isinstance(digest, str):
+            raise AssertionError("Activation-safety case identity/prompt/hash is incomplete")
+        if case_id in case_ids or digest in prompt_hashes:
+            raise AssertionError("Activation-safety case IDs and prompt hashes must be unique")
+        if hashlib.sha256(prompt.encode("utf-8")).hexdigest() != digest:
+            raise AssertionError(f"Activation-safety prompt hash mismatch: {case_id}")
+        case_ids.add(case_id)
+        prompt_hashes.add(digest)
+
+    by_id = {case["case_id"]: case for case in cases}
+    activation_ids = {"activation-only-run-skill-001", "activation-only-name-skill-002"}
+    for case_id in activation_ids:
+        case = by_id.get(case_id, {})
+        if case.get("expected_mode") is not None or case.get("expected_error") != "E_ROUTE_AMBIGUOUS":
+            raise AssertionError(f"Activation-only case must stop at E_ROUTE_AMBIGUOUS: {case_id}")
+        required_forbidden = {"scan_workspace", "read_workspace_content", "create_log", "generate_output"}
+        if not required_forbidden.issubset(set(case.get("forbidden_actions", []))):
+            raise AssertionError(f"Activation-only case lacks forbidden actions: {case_id}")
+
+    unconfirmed = by_id.get("create-with-unconfirmed-workspace-003", {})
+    if (
+        unconfirmed.get("expected_mode") != "create"
+        or unconfirmed.get("expected_error") != "E_INPUT_UNCONFIRMED"
+        or "read_workspace_content" not in unconfirmed.get("forbidden_actions", [])
+    ):
+        raise AssertionError("Unconfirmed-workspace regression contract is incomplete")
+    if by_id.get("create-with-explicit-workspace-files-004", {}).get("expected_source_authority") != "explicit_path":
+        raise AssertionError("Explicit workspace paths must activate explicit_path authority")
+    if by_id.get("create-with-current-turn-content-005", {}).get("expected_source_authority") != "current_turn":
+        raise AssertionError("Current-turn content must activate current_turn authority")
+
+    required_markers = {
+        "SKILL.md": ["E_ROUTE_AMBIGUOUS", "本次已确认输入"],
+        "references/rule-routing-and-modes.md": ["明确执行意图门", "不得读取这些文件的内容"],
+        "references/rule-intake.md": ["本次输入归属门", "E_INPUT_UNCONFIRMED", "长期记忆"],
+        "references/workflow.md": ["在扫描工作区之前执行明确意图门", "未确认的工作区文件不得读取正文"],
+        "references/rule-guardrails.md": ["仅调用或点名 Skill 不得推断为 `create`", "不能自动成为本次输入"],
+        "references/rule-failure-recovery.md": ["E_INPUT_UNCONFIRMED"],
+    }
+    for relative, markers in required_markers.items():
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        missing = [marker for marker in markers if marker not in text]
+        if missing:
+            raise AssertionError(f"Activation/input contract markers missing from {relative}: {missing}")
+    return {
+        "safety_cases": len(cases),
+        "activation_only_cases": len(activation_ids),
+        "error_codes": ["E_ROUTE_AMBIGUOUS", "E_INPUT_UNCONFIRMED"],
+    }
+
+
+def check_template_assets() -> dict[str, Any]:
+    manifest = load_json(TEMPLATE_MANIFEST_PATH)
+    templates = manifest.get("templates")
+    design_templates = manifest.get("design_resources", {}).get("templates")
+    if not isinstance(templates, dict) or not isinstance(design_templates, dict):
+        raise AssertionError("Template manifest must declare templates and design_resources.templates")
+    if set(templates) != set(design_templates):
+        raise AssertionError(
+            "Selectable template keys differ from design routes: "
+            f"templates={sorted(templates)} design_routes={sorted(design_templates)}"
+        )
+
+    evidence: dict[str, Any] = {}
+    for key, record in sorted(templates.items()):
+        if not isinstance(record, dict):
+            raise AssertionError(f"Template record must be an object: {key}")
+        asset = record.get("asset")
+        if not isinstance(asset, str) or not asset.endswith(".pptx"):
+            raise AssertionError(f"Template {key} must declare a PPTX asset")
+        path = ROOT / asset
+        if not path.is_file():
+            raise AssertionError(f"Template asset is missing: {asset}")
+        try:
+            with ZipFile(path) as archive:
+                names = archive.namelist()
+        except Exception as exc:
+            raise AssertionError(f"Template asset is not a readable PPTX package: {asset}: {exc}") from exc
+        slide_count = sum(bool(re.fullmatch(r"ppt/slides/slide\d+\.xml", name)) for name in names)
+        master_count = sum(bool(re.fullmatch(r"ppt/slideMasters/slideMaster\d+\.xml", name)) for name in names)
+        if record.get("slides") != slide_count or record.get("masters") != master_count:
+            raise AssertionError(
+                f"Template metadata mismatch for {key}: "
+                f"slides={slide_count}/{record.get('slides')} masters={master_count}/{record.get('masters')}"
+            )
+        expected_sha = record.get("asset_sha256")
+        if expected_sha:
+            actual_sha = hashlib.sha256(path.read_bytes()).hexdigest()
+            if actual_sha != expected_sha:
+                raise AssertionError(f"Template SHA-256 mismatch for {key}")
+        evidence[key] = {"slides": slide_count, "masters": master_count, "asset": asset}
+
+    loop = templates.get("loop-orange-white", {})
+    menu_templates = manifest.get("menus", {}).get("template", [])
+    branch = manifest.get("branch_styles", {}).get("D", {})
+    if (
+        loop.get("display_name") != "LOOP 大会"
+        or loop.get("direct_select") is not True
+        or "loop-orange-white" not in menu_templates
+        or branch.get("asset") != loop.get("asset")
+    ):
+        raise AssertionError("LOOP conference template is not registered as a direct selectable asset")
+    return {"template_count": len(evidence), "templates": evidence, "loop_direct_select": True}
 
 
 def imported_roots(tree: ast.AST) -> set[str]:
@@ -436,18 +579,46 @@ def check_generation_log_dry_run_and_actual() -> dict[str, Any]:
     script = SCRIPTS / "create_generation_log.py"
     with temporary_directory() as temporary:
         cwd = Path(temporary)
+        rejected = run(
+            [sys.executable, "-B", str(script), "--mode", "create", "--title", "Harness 未确认输入"],
+            cwd=cwd,
+            expected=1,
+        )
+        if "E_INPUT_UNCONFIRMED" not in rejected.stderr or list(cwd.iterdir()):
+            raise AssertionError("Generation log must reject unconfirmed create input without writing")
         dry = run(
-            [sys.executable, "-B", str(script), "--dry-run", "--mode", "create", "--title", "Harness 预览"],
+            [
+                sys.executable,
+                "-B",
+                str(script),
+                "--dry-run",
+                "--mode",
+                "create",
+                "--source-authority",
+                "current_turn",
+                "--title",
+                "Harness 预览",
+            ],
             cwd=cwd,
         )
         if list(cwd.iterdir()):
             raise AssertionError("Generation-log --dry-run wrote files")
-        for required in ("Skill 版本：V1.1", "排版安全版本：V1", "任务模式：create", "## 失败、重试与降级"):
+        for required in ("Skill 版本：V1.1", "排版安全版本：V1", "模板包版本：V1.1", "任务模式：create", "输入归属：current_turn", "## 失败、重试与降级"):
             if required not in dry.stdout:
                 raise AssertionError(f"Generation-log dry-run is missing {required!r}")
 
         actual = run(
-            [sys.executable, "-B", str(script), "--mode", "convert", "--title", "Harness 实写"],
+            [
+                sys.executable,
+                "-B",
+                str(script),
+                "--mode",
+                "convert",
+                "--source-authority",
+                "explicit_path",
+                "--title",
+                "Harness 实写",
+            ],
             cwd=cwd,
         )
         output_path = Path(actual.stdout.strip())
@@ -459,10 +630,10 @@ def check_generation_log_dry_run_and_actual() -> dict[str, Any]:
         if len(files) != 1 or files[0].resolve() != output_path.resolve():
             raise AssertionError("Generation-log actual mode must create exactly one log")
         text = output_path.read_text(encoding="utf-8")
-        for required in ("Skill 版本：V1.1", "排版安全版本：V1", "任务模式：convert", "## 遗留问题"):
+        for required in ("Skill 版本：V1.1", "排版安全版本：V1", "模板包版本：V1.1", "任务模式：convert", "输入归属：explicit_path", "## 遗留问题"):
             if required not in text:
                 raise AssertionError(f"Generated log is missing {required!r}")
-    return {"dry_run_writes": 0, "actual_logs_created": 1}
+    return {"unconfirmed_rejected": 1, "dry_run_writes": 0, "actual_logs_created": 1}
 
 
 def check_html_fixtures() -> dict[str, Any]:
@@ -631,7 +802,20 @@ def check_helper_contracts() -> dict[str, Any]:
         logo_names = {item["name"] for item in scan_report["categories"]["logo_candidate"]["recent"]}
         if source_names != {"source.md"} or logo_names != {"brand-logo.png"}:
             raise AssertionError(f"Task-context noise filtering changed: sources={source_names}, logos={logo_names}")
-    return {"content_budget": risks, "layout_decks": 2, "scan_sources": sorted(source_names)}
+        authority = scan_report.get("input_authority", {})
+        if (
+            authority.get("status") != "unknown_to_scanner"
+            or authority.get("workspace_files_are_candidates_only") is not True
+            or authority.get("requires_external_confirmation") is not True
+            or scan_report.get("status_flags", {}).get("has_unconfirmed_workspace_candidates") is not True
+        ):
+            raise AssertionError("Task-context scanner must label workspace files as unconfirmed candidates")
+    return {
+        "content_budget": risks,
+        "layout_decks": 2,
+        "scan_sources": sorted(source_names),
+        "workspace_authority": "unknown_to_scanner",
+    }
 
 
 def assert_evaluator_result(
@@ -820,7 +1004,9 @@ def check_packaging() -> dict[str, Any]:
 CHECKS: list[tuple[str, str, Callable[[], dict[str, Any]]]] = [
     ("frontmatter_and_protected_section", "structural", check_frontmatter_and_protected_section),
     ("version_manifests_agents_and_paths", "structural", check_version_manifests_agents_and_paths),
+    ("template_assets", "structural", check_template_assets),
     ("no_stale_contracts", "structural", check_no_stale_contracts),
+    ("activation_and_input_authority_contracts", "structural_fixture", check_activation_and_input_authority_contracts),
     ("ast_compile_and_dependency_graph", "structural", check_ast_compile_and_dependency_graph),
     ("cli_help_dependency_errors_and_wrapper_contract", "deterministic_contract", check_cli_help_dependency_errors_and_wrapper_contract),
     ("generation_log_dry_run_and_actual", "deterministic_fixture", check_generation_log_dry_run_and_actual),

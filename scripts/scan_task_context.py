@@ -182,6 +182,12 @@ def build_summary(root: Path, max_files: int, recent_limit: int) -> dict:
         for name, items in sorted(categories.items())
     }
 
+    has_workspace_candidates = bool(
+        categories.get("design_file")
+        or categories.get("content_file")
+        or categories.get("source_candidate")
+    )
+
     return {
         "root": root.as_posix(),
         "generated_at": utc_now(),
@@ -191,12 +197,22 @@ def build_summary(root: Path, max_files: int, recent_limit: int) -> dict:
         "extension_counts": dict(sorted(ext_counts.items())),
         "categories": compact_categories,
         "rule_hints": rule_hints(categories),
+        "input_authority": {
+            "status": "unknown_to_scanner",
+            "workspace_files_are_candidates_only": True,
+            "requires_external_confirmation": has_workspace_candidates,
+            "rule": (
+                "File presence does not authorize content use; confirm the source from the current request "
+                "or an explicit user selection before reading content or writing outputs."
+            ),
+        },
         "status_flags": {
             "has_design_md": bool(categories.get("design_file")),
             "has_content_md": bool(categories.get("content_file")),
             "has_generation_log": bool(categories.get("generation_log")),
             "has_pptx_output_candidate": any(item["ext"] == ".pptx" for item in categories.get("output_candidate", [])),
             "has_machine_reports": bool(categories.get("machine_report") or categories.get("inspect_report")),
+            "has_unconfirmed_workspace_candidates": has_workspace_candidates,
         },
     }
 

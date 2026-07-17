@@ -9,7 +9,17 @@ from pathlib import Path
 
 SKILL_VERSION = "V1.1"
 LAYOUT_SAFETY_VERSION = "V1"
+TEMPLATE_BUNDLE_VERSION = "V1.1"
 LOG_MODES = ("create", "convert", "repair", "check_only")
+SOURCE_AUTHORITIES = (
+    "unconfirmed",
+    "current_turn",
+    "explicit_path",
+    "confirmed_workspace",
+    "confirmed_continuation",
+    "not_applicable",
+)
+SOURCE_REQUIRED_MODES = {"create", "convert", "repair"}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -17,6 +27,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mode", choices=LOG_MODES, default="create", help="Task mode; handoff has no generation log.")
     parser.add_argument("--title", default="TGO演示稿生成", help="Task or deck title.")
     parser.add_argument("--source", default="待补充", help="Source file or content description.")
+    parser.add_argument(
+        "--source-authority",
+        choices=SOURCE_AUTHORITIES,
+        default="unconfirmed",
+        help=(
+            "How the source became active for this task. create/convert/repair require "
+            "current_turn, explicit_path, confirmed_workspace, or confirmed_continuation."
+        ),
+    )
     parser.add_argument("--scenario", default="待确认", help="GTLC or daily sharing.")
     parser.add_argument("--spec", default="16:9", help="Slide ratio/spec, such as 16:9.")
     parser.add_argument("--format", default="待确认", help="PPT, HTML, or both.")
@@ -39,6 +58,7 @@ def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
 
 - Skill 版本：{SKILL_VERSION}
 - 排版安全版本：{LAYOUT_SAFETY_VERSION}
+- 模板包版本：{TEMPLATE_BUNDLE_VERSION}
 - 任务模式：{args.mode}
 - 创建时间：{now.isoformat(timespec="seconds")}
 - 当前目录：`{cwd}`
@@ -46,6 +66,7 @@ def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
 - Design.md：{args.design_file}
 - Content.md：{args.content_file}
 - 来源：{args.source}
+- 输入归属：{args.source_authority}
 - 场景：{args.scenario}
 - 规格：{args.spec}
 - 输出格式：{args.format}
@@ -57,6 +78,7 @@ def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
 ## 澄清与内容边界
 
 - 待记录：用户明确要求、内容是否允许改写、覆盖决定与不可逆边界。
+- 待记录：执行意图证据、已确认输入路径及其归属；工作区存在性或历史记忆不能代替确认。
 - 待记录：`check_only` 保持源文件只读；`repair` 记录来源与回滚点。
 
 ## 页数、大纲与文本预算
@@ -103,6 +125,11 @@ def render_log(args: argparse.Namespace, now: datetime, cwd: Path) -> str:
 
 def main() -> None:
     args = build_parser().parse_args()
+    if args.mode in SOURCE_REQUIRED_MODES and args.source_authority in {"unconfirmed", "not_applicable"}:
+        raise SystemExit(
+            "E_INPUT_UNCONFIRMED: create/convert/repair requires an active source authority; "
+            "action=confirm current-turn content, an explicit path, a workspace candidate, or a continuation source"
+        )
     now = datetime.now().astimezone()
     cwd = Path.cwd()
     content = render_log(args, now, cwd)

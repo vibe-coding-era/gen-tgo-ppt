@@ -17,7 +17,7 @@ Use this index only to route progressive loading after the user's clarification.
 - `references/design/templates/light/design.md`: load when the user chooses light template or no template is specified for normal business sharing.
 - `references/design/templates/dark/design.md`: load when the user chooses dark template or keynote/opening/high-impact narrative implies it.
 - `references/design/templates/tgo-daily/design.md`: load when the scene is `TGO日常活动分享` or the user chooses the TGO daily sharing template. Do not use as the default for `GTLC 大会`.
-- `references/design/templates/loop-orange-white/design.md`: load when the user chooses `D｜LOOP Summit 橙白峰会风` or explicitly asks for the LOOP Summit branch style. Do not use as the default for `GTLC 大会`.
+- `references/design/templates/loop-orange-white/design.md`: load when the user chooses `D｜LOOP 大会`, `LOOP Summit`, `LOOP Orange White`, or explicitly asks for the LOOP conference template. Do not use as the default for `GTLC 大会`.
 
 ## Load By Visual Style Number
 
@@ -38,11 +38,11 @@ If the user assigns different styles to different pages or sections, load only t
 - Template preview: `assets/design/previews/templates/template-contact-sheet.png`
 - TGO daily template preview: `assets/design/previews/templates/tgo-daily-template-contact-sheet.png`
 - GTLC branch style selector preview: `assets/design/branches/loop-orange-white/tgo-gtlc-style-branches-contact-sheet.png`
-- LOOP Orange White complete preview: `assets/design/branches/loop-orange-white/loop-2026-template-complete-contact-sheet.png`
+- LOOP conference template preview: `assets/design/templates/loop-orange-white/tgo-loop-summit-16x9-contact-sheet.png`
 - Visual style preview: `assets/design/previews/styles/tgo-presentation-design-system-v1.png`
 - Style 9 thumbnail: `assets/design/previews/styles/style-09-enterprise-ai-consulting.png`
 - White PPTX: `assets/design/templates/white/tgo-gtlc-white.pptx`
 - Light PPTX: `assets/design/templates/light/tgo-gtlc-light.pptx`
 - Dark PPTX: `assets/design/templates/dark/tgo-gtlc-dark.pptx`
 - TGO daily PPTX: `assets/design/templates/tgo-daily/tgo-daily-sharing-16-9.pptx`
-- LOOP Orange White branch assets: `assets/design/branches/loop-orange-white/`
+- LOOP conference PPTX: `assets/design/templates/loop-orange-white/tgo-loop-summit-16x9.pptx`

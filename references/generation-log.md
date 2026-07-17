@@ -12,18 +12,20 @@
 ## 版本口径
 
 - Skill 版本：`V1.1`。
-- 排版安全/模板包版本：`V1`。
-- 两者独立演进，不得把模板包版本自动提升为 Skill 版本。
+- 排版安全版本：`V1`。
+- 模板包版本：`V1.1`。
+- Skill、模板包与排版安全版本独立演进，不得互相推导。
 
 ## 文件规则
 
 - 文件名：`gen-tgo-ppt-生成日志-YYYYMMDD-HHMMSS.md`。
 - 默认拒绝覆盖同名日志；可先用 `scripts/create_generation_log.py --dry-run` 预览。
+- `create`、`convert`、`repair` 调用日志脚本时必须传入 `--source-authority current_turn|explicit_path|confirmed_workspace|confirmed_continuation`；缺失时返回 `E_INPUT_UNCONFIRMED` 且不得写文件。
 - 最终回复给出日志路径，并在交付前更新结果和遗留问题。
 
 ## 必填内容
 
-模式、Skill/排版版本、时间、工作目录、来源、场景、规格、格式、处理模式、Logo、模板/风格、Design/Content、内容改写边界、页纲与文本预算、样片决定、输出、检查命令与结果、渲染证据、失败码与恢复、通道分工及其真实性、SSOT（若适用）、用户批准例外和遗留问题。
+模式、执行意图证据、Skill/排版版本、时间、工作目录、已确认输入及归属、来源、场景、规格、格式、处理模式、Logo、模板/风格、Design/Content、内容改写边界、页纲与文本预算、样片决定、输出、检查命令与结果、渲染证据、失败码与恢复、通道分工及其真实性、SSOT（若适用）、用户批准例外和遗留问题。
 
 ## 模板骨架
 
@@ -32,13 +34,16 @@
 
 - Skill 版本：V1.1
 - 排版安全版本：V1
+- 模板包版本：V1.1
 - 任务模式：create / convert / repair / check_only
+- 执行意图证据：
 - 创建时间：
 - 当前目录：
 - 任务标题：
 - Design.md：
 - Content.md：
 - 来源：
+- 输入归属：current_turn / explicit_path / confirmed_workspace / confirmed_continuation / not_applicable
 - 场景 / 规格 / 输出格式：
 - 处理模式 / Logo / 模板 / 风格：
 

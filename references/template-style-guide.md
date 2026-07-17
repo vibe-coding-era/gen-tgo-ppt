@@ -10,5 +10,6 @@ Use `references/design/index.md` first, then load only the required reusable `de
 - White template: `references/design/templates/white/design.md`
 - Light template: `references/design/templates/light/design.md`
 - Dark template: `references/design/templates/dark/design.md`
+- LOOP conference template: `references/design/templates/loop-orange-white/design.md`
 
 Do not treat this file as the full style guide. It remains only for backward-compatible discovery.

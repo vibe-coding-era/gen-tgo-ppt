@@ -9,6 +9,7 @@
 | routing | `E_ROUTE_AMBIGUOUS` | 是 | 询问一个决定模式的问题 |
 | routing | `E_ROUTE_OUT_OF_SCOPE` | 否 | 进入 `handoff`，不伪造产物 |
 | process | `E_INPUT_MISSING` | 是 | 列出最小缺失输入或采用明确降级 |
+| grounding | `E_INPUT_UNCONFIRMED` | 是 | 只展示候选文件名/时间并请求用户选择；确认前不读取正文、不写日志或产物 |
 | process | `E_WORKDIR_READONLY` | 条件式 | 停止写入，索取可写目录 |
 | process | `E_OUTPUT_EXISTS` | 条件式 | 预览目标并取得覆盖确认，或改用新文件名 |
 | grounding | `E_SOURCE_UNREADABLE` | 条件式 | 报告损坏/不支持格式并请求替代来源 |
@@ -39,4 +40,3 @@
 - 生产失败样本只能加入 `routing-regression.json` 的后续版本，并记录修复原因。
 - `routing-holdout.json` 是发布评测集；不得因看到失败结果而即时改写 gold、prompt 或阈值。
 - fixture 结果只能标 `structural_fixture`；没有真实模型运行记录时不得标 `observed_model_behavior`。
-

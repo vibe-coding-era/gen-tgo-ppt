@@ -13,7 +13,7 @@ Load this file when the user chooses `1. GTLC 大会`.
 - Default template: `light` for mixed business content.
 - Use `dark` for keynote openings, major announcements, AI-native topics, and closing rhythm.
 - Use `white` for dense reports, tables, or materials intended for printing.
-- Offer `D｜LOOP Summit 橙白峰会风` as a branch style for AI ecosystem summits, sponsor benefits, city chapter event promotion, and event-facing materials.
+- Offer `D｜LOOP 大会` as the directly selectable template for AI ecosystem summits, sponsor benefits, city chapter event promotion, and event-facing materials.
 - Do not default to `tgo-daily`; it is reserved for TGO日常活动分享 and other non-GTLC scenes unless the user explicitly requests it.
 
 ## Layout Priorities
@@ -27,5 +27,5 @@ Load this file when the user chooses `1. GTLC 大会`.
 ## Style Fit
 
 - Recommended visual styles: `1 Executive Board`, `3 Big Tech Keynote`, `4 AI Native`, `5 Data Intelligence`.
-- Recommended branch style for event promotion and sponsor materials: `D｜LOOP Summit 橙白峰会风`.
+- Recommended event template for promotion and sponsor materials: `D｜LOOP 大会` (`loop-orange-white`).
 - Use `8 Creative Festival` only for creative/community sections, not as the whole-deck default.
